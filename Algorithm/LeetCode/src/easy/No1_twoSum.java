@@ -31,7 +31,7 @@ import java.util.HashMap;
  * @Author haoliang.jiang
  * @Date 2021/12/15 1:30 上午
  */
-public class No1_twoNumSum {
+public class No1_twoSum {
     public static void main (String[] args){
         int[] indexs;
         int[] nums = {2,7,11,15};

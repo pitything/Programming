@@ -45,7 +45,8 @@ public class No2_addTwoNumbers {
         int[] arr2 = {9,9,9,9};
         ListNode l1 = getNodeByArray(arr1);
         ListNode l2 = getNodeByArray(arr2);
-        addTwoNumbers1(l1.next.next, l2.next.next);
+        ListNode result = addTwoNumbers1(l1.next, l2.next);
+        System.out.println(result);
     }
 
     /**
@@ -88,24 +89,32 @@ public class No2_addTwoNumbers {
      */
     private static ListNode getNodeByArray(int[] array){
         ListNode node = new ListNode();
-        ListNode node1 = new ListNode();
-        ListNode node2;
+        ListNode node1;
 
-        node.next = node1;
+        node1 = node;
         for (int i = 0; i < array.length; i++) {
-            node2 = new ListNode();
-            node2.val = array[i];
-            node1.next = node2;
-            node1 = node2;
+            node1.next = new ListNode(array[i]);
+            node1 = node1.next;
         }
         return node;
     }
 
     static class ListNode{
-      int val;
-      ListNode next;
-      ListNode() {}
-      ListNode(int val) { this.val = val; }
-      ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+        int val;
+        ListNode next;
+        ListNode() {}
+        ListNode(int val) { this.val = val; }
+        ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+
+        @Override
+        public String toString() {
+            List<Integer> res = new ArrayList<>();
+            ListNode node = this;
+            while (node != null) {
+                res.add(node.val);
+                node = node.next;
+            }
+            return res.toString();
+        }
     }
 }

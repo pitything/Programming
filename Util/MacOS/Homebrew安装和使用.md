@@ -101,62 +101,62 @@ source ~/.zshrc
 - 安装任意包
 
   ```ruby
-$ brew install <packageName>
-    brew install --cask <packageName>
+brew install <packageName>
+  brew install --cask <packageName>
   ```
   
 示例：安装node
   
 ```ruby
-  $ brew install node
+  brew install node
 ```
   
 - 卸载任意包
 
   ```ruby
-$ brew uninstall <packageName>
+brew uninstall <packageName>
   ```
   
   示例：卸载git
 
   ```ruby
-$ brew uninstall git
+brew uninstall git
   ```
 
 - 查询可用包
 
   ```ruby
-$ brew search <packageName>
+brew search <packageName>
   ```
   
 - 查看已安装包列表
 
   ```cpp
-$ brew list
+brew list
   ```
   
 - 查看任意包信息
 
   ```ruby
-$ brew info <packageName>
+brew info <packageName>
   ```
   
 - 更新Homebrew
 
   ```ruby
-$ brew update
+brew update
   ```
   
 - 查看Homebrew版本
 
   ```ruby
-$ brew -v
+brew -v
   ```
   
 - Homebrew帮助信息
 
   ```ruby
-$ brew -h
+brew -h
   ```
 
 # MacBook常用软件和包

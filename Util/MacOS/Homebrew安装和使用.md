@@ -101,14 +101,15 @@ source ~/.zshrc
 - 安装任意包
 
   ```ruby
-brew install <packageName>
+  brew install <packageName>
   brew install --cask <packageName>
   ```
-  
+
 示例：安装node
   
 ```ruby
   brew install node
+  brew install openjdk@8
 ```
   
 - 卸载任意包
@@ -179,6 +180,7 @@ brew -h
 ## Google Chrome
 ## IINA
 ## IntelliJ IDEA
+## JDK8
 ## Maven
 ## Mysql
 ## Parallels Desktop
@@ -213,6 +215,7 @@ brew install git;
 brew install --cask google-chrome;
 brew install --cask iina;
 brew install --cask intellij-idea;
+brew install openjdk@8;
 brew install maven;
 brew install mysql;
 brew install --cask parallels;
@@ -220,7 +223,7 @@ brew install --cask qq;
 brew install --cask royal-tsx;
 brew install redis;
 brew install --cask snipaste;
-brew install --cask sublime-text；
+brew install --cask sublime-text;
 brew install --cask the-unarchiver;
 brew install --cask typora;
 brew install --cask v2rayu;

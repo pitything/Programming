@@ -27,36 +27,30 @@ Homebrew是一款Mac OS平台下的软件包管理工具，拥有安装、卸载
 
 # Homebrew基本使用
 
-- 安装任意包
-
-  
+- 安装任意包分短发短发短发的短发短发短发似懂非懂
 
   ```ruby
-  $ brew install <packageName>
+$ brew install <packageName>
   ```
-
+  
   示例：安装node
 
   
 
   ```ruby
-  $ brew install node
+$ brew install node
   ```
-
+  
 - 卸载任意包
 
-  
-
   ```ruby
-  $ brew uninstall <packageName>
+$ brew uninstall <packageName>
   ```
-
+  
   示例：卸载git
 
-  
-
   ```ruby
-  $ brew uninstall git
+$ brew uninstall git
   ```
 
 - 查询可用包

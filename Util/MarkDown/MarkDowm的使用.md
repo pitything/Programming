@@ -1,3 +1,5 @@
+# MarkDown的使用
+
 ## 基础使用
 
 ### 标题
@@ -297,3 +299,14 @@ $$
 E=mc^2
 $$
 ```
+
+
+
+## 实用插件/脚本
+
+### 自动编号
+
+> - 打开链接：https://github.com/lipengzhou/typora-theme-auto-numbering下载脚本
+> - 将仓库中的 `base.user.css` 和 `github.user.css` 两个文件都拷贝到主题目录中
+> - 配置完成，重启 typora 文档内容标题就会有自动编号了
+

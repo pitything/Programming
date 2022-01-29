@@ -22,7 +22,7 @@ Homebrew是一款Mac OS平台下的软件包管理工具，拥有安装、卸载
 (替补地址)/bin/zsh -c "$(curl -fsSL https://gitee.com/cunkai/HomebrewCN/raw/master/Homebrew.sh)"
 ```
 
-### 配置
+### 配置（更换源）
 
 #### 必备设置
 
@@ -104,60 +104,60 @@ source ~/.zshrc
   brew install <packageName>
   brew install --cask <packageName>
   ```
-
-示例：安装node
   
-```ruby
+  示例：安装node
+  
+  ```
   brew install node
   brew install openjdk@8
-```
+  ```
   
 - 卸载任意包
 
   ```ruby
-brew uninstall <packageName>
+  brew uninstall <packageName>
   ```
-  
+
   示例：卸载git
 
   ```ruby
-brew uninstall git
+  brew uninstall git
   ```
 
 - 查询可用包
 
   ```ruby
-brew search <packageName>
+  brew search <packageName>
   ```
-  
+
 - 查看已安装包列表
 
   ```cpp
-brew list
+  brew list
   ```
-  
+
 - 查看任意包信息
 
   ```ruby
-brew info <packageName>
+  brew info <packageName>
   ```
-  
+
 - 更新Homebrew
 
   ```ruby
-brew update
+  brew update
   ```
-  
+
 - 查看Homebrew版本
 
   ```ruby
-brew -v
+  brew -v
   ```
-  
+
 - Homebrew帮助信息
 
   ```ruby
-brew -h
+  brew -h
   ```
 
 # MacBook常用软件和包
@@ -183,12 +183,15 @@ brew -h
 ## JDK8
 ## Maven
 ## Mysql
+## node.js
 ## Parallels Desktop
+## picgo
 ## QQ
 ## Royal TSX
 ## redis
 ## Snipaste
 ## sublime-text
+## Subversion
 ## The Unarchiver
 ## Typora
 ## V2rayU
@@ -218,12 +221,15 @@ brew install --cask intellij-idea;
 brew install openjdk@8;
 brew install maven;
 brew install mysql;
+brew install node;
 brew install --cask parallels;
+brew install --cask picgo;
 brew install --cask qq;
 brew install --cask royal-tsx;
 brew install redis;
 brew install --cask snipaste;
 brew install --cask sublime-text;
+brew install subversion;
 brew install --cask the-unarchiver;
 brew install --cask typora;
 brew install --cask v2rayu;
@@ -233,31 +239,3 @@ brew install --cask xmind-zen;
 ```
 
 
-
-# 注意
-
-在Mac OS X 10.11系统以后，/usr/local/等系统目录下的文件读写是需要系统root权限的，以往的Homebrew安装如果没有指定安装路径，会默认安装在这些需要系统root用户读写权限的目录下，导致有些指令需要添加sudo前缀来执行，比如升级Homebrew需要：
-
-```ruby
-$ sudo brew update
-```
-
-如果你不想每次都使用sudo指令，你有两种方法可以选择:
-
-1. 对/usr/local 目录下的文件读写进行root用户授权
-
-   ```bash
-$ sudo chown -R $USER /usr/local
-   ```
-   
-   示例：
-
-   ```bash
-$ sudo chown -R gaojun /usr/local
-   ```
-
-2. （推荐）安装Homebrew时对安装路径进行指定，直接安装在不需要系统root用户授权就可以自由读写的目录下
-
-   ```bash
-<install path> -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-   ```

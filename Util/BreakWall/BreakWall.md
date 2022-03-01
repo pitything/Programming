@@ -60,3 +60,7 @@ wget -N --no-check-certificate "[https://raw.githubusercontent.com/hijkpw/Linux-
  加密协议 = aes-256-gcm
 
  SS 链接 = ss://YWVzLTI1Ni1nY206SmlhbmdobDEwMTlANDMuMTM0LjE2OC4xMDozMzIwMg==#233v2.com_ss_43.134.168.10
+
+
+## 连接
+> 关闭防火墙：设置所有端口都支持TCP、UDP协议

@@ -2,7 +2,19 @@
 <module type="JAVA_MODULE" version="4">
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
-    <content url="file://$MODULE_DIR$" />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/Java/JavaSE" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Java/JavaSE/src/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/BaseKnowledge/数据结构与算法" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/Java/JavaSE/第3章_数组/DDD" />
+      <excludeFolder url="file://$MODULE_DIR$/Java/JavaSE/src/src/com" />
+      <excludeFolder url="file://$MODULE_DIR$/Java/JavaSE/src/src/java" />
+      <excludeFolder url="file://$MODULE_DIR$/Java/JavaSE/src/src/javax" />
+      <excludeFolder url="file://$MODULE_DIR$/Java/JavaSE/src/src/jdk" />
+      <excludeFolder url="file://$MODULE_DIR$/Java/JavaSE/src/src/launcher" />
+      <excludeFolder url="file://$MODULE_DIR$/Java/JavaSE/src/src/org" />
+      <excludeFolder url="file://$MODULE_DIR$/Java/JavaSE/src/src/sun" />
+    </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>

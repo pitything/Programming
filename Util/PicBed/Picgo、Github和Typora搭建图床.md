@@ -55,6 +55,7 @@ categories:
 ![img](https://raw.githubusercontent.com/pitything/images/main/https://raw.githubusercontent.com/pitything/images/master/format,png-20220129213727595.png)
 
 然后复制生成一串字符 token，这个 token 只出现一次，所以要保存一下。
+注意：如果typera上传图片失败，可能是token失效了，重新建一个token，进行配置
 
 ![img](https://raw.githubusercontent.com/pitything/images/main/https://raw.githubusercontent.com/pitything/images/master/aHR0cHM6Ly9yYXcuZ2l0aHVidXNlcmNvbnRlbnQuY29tL3llZmNpb24vUGljRGF0YS9tYXN0ZXIvaW1nLzIwMTkwMzExMjIzOTAxLnBuZw.png)
 

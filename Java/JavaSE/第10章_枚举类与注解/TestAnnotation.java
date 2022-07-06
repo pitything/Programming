@@ -6,31 +6,39 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
-public class TestAnnotation {
+@MyAnnotation("hello")
+@MyAnnotation("hello world")
+public class TestAnnotation<T> {
+    @MyAnnotation
+    private String name;
     @Check(min = 10)
     public int num;
-
     TestAnnotation(){}
     TestAnnotation(int num){
         this.num = num;
     }
 
+
     public static void main (String[] args){
-        final Logger logger = LoggerFactory.getLogger(TestAnnotation.class);
+        TestAnnotation<@MyAnnotation String> t = null;
+        int a = (@MyAnnotation int) 2L;
+        @MyAnnotation
+        int b = 10;
 
         /** Check是否存在 */
         boolean annotationPresent = TestAnnotation.class.isAnnotationPresent(Check.class);
         /** 获取Check注解 */
         Check check = TestAnnotation.class.getAnnotation(Check.class);
-        System.out.println(null != check ? check.min() : null);
 
         try {
             check(new TestAnnotation(-1));
         }catch (Exception exception){
             exception.printStackTrace();
-            logger.error(exception.getMessage());
         }
     }
+
+    public static <@MyAnnotation T> void method(T t) { }
+    public static void test(@MyAnnotation String arg) throws @MyAnnotation Exception { }
 
     static void check(TestAnnotation annotation) throws Exception {
         Constructor constructor = TestAnnotation.class.getConstructors()[0];
@@ -50,4 +58,16 @@ public class TestAnnotation {
 @interface Check{
     int min() default 1;
     int max() default 100;
+}
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE_USE})
+@Repeatable(MyAnnotations.class)
+@interface MyAnnotation{
+    String value() default "hello";
+}
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ElementType.TYPE_USE})
+@interface MyAnnotations{
+    MyAnnotation[] value();
 }

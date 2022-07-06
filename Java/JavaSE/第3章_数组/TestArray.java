@@ -53,6 +53,9 @@ public class TestArray {
         System.out.println(Arrays.toString(a2)); // [1, 2, 3, 4, 7]
         System.out.println(Arrays.binarySearch(a2, 3)); // 2，二分查找，返回下标
 
+        System.out.println(Arrays.toString(Arrays.copyOf(a2, 3))); // 数组复制 3个元素：[1, 2, 3]
+        System.out.println(Arrays.toString(Arrays.copyOfRange(a2, 2, 4))); // 数组复制 [2，4)区间：[3, 4]
+
         int[] intArr = new int[]{1, 3, 2, 45, 23, 32};
         String[] strArr = new String[]{"中国","日本","美国"};
 

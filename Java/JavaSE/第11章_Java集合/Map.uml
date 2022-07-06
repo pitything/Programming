@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>java.util.HashMap</OriginalElement>
+  <nodes>
+    <node x="683.75" y="162.0">java.util.LinkedHashMap</node>
+    <node x="857.0" y="80.0">java.util.IdentityHashMap</node>
+    <node x="518.53125" y="242.0">java.util.TreeMap</node>
+    <node x="415.03125" y="0.0">java.util.Map</node>
+    <node x="660.0" y="80.0">java.util.HashMap</node>
+    <node x="0.0" y="162.0">java.util.NavigableMap</node>
+    <node x="221.0" y="80.0">java.util.WeakHashMap</node>
+    <node x="12.0" y="80.0">java.util.SortedMap</node>
+    <node x="459.0" y="80.0">java.util.Hashtable</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="java.util.TreeMap" target="java.util.NavigableMap" relationship="REALIZATION">
+      <point x="0.0" y="-14.0" />
+      <point x="603.03125" y="216.0" />
+      <point x="106.5" y="216.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="java.util.TreeMap" target="java.util.Map" relationship="REALIZATION">
+      <point x="0.0" y="-14.0" />
+      <point x="603.03125" y="216.0" />
+      <point x="1102.5" y="216.0" />
+      <point x="1102.5" y="59.0" />
+      <point x="797.25" y="59.0" />
+      <point x="797.25" y="49.0" />
+      <point x="517.03125" y="49.0" />
+      <point x="34.0" y="14.0" />
+    </edge>
+    <edge source="java.util.SortedMap" target="java.util.Map" relationship="INTERFACE_GENERALIZATION">
+      <point x="0.0" y="-14.0" />
+      <point x="106.5" y="49.0" />
+      <point x="449.03125" y="49.0" />
+      <point x="-34.0" y="14.0" />
+    </edge>
+    <edge source="java.util.NavigableMap" target="java.util.SortedMap" relationship="INTERFACE_GENERALIZATION">
+      <point x="0.0" y="-14.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="java.util.Hashtable" target="java.util.Map" relationship="REALIZATION">
+      <point x="0.0" y="-14.0" />
+      <point x="549.5" y="59.0" />
+      <point x="797.25" y="59.0" />
+      <point x="797.25" y="49.0" />
+      <point x="517.03125" y="49.0" />
+      <point x="34.0" y="14.0" />
+    </edge>
+    <edge source="java.util.LinkedHashMap" target="java.util.HashMap" relationship="GENERALIZATION">
+      <point x="-56.75" y="-14.0" />
+      <point x="740.5" y="135.0" />
+      <point x="748.0" y="135.0" />
+      <point x="0.0" y="14.0" />
+    </edge>
+    <edge source="java.util.WeakHashMap" target="java.util.Map" relationship="REALIZATION">
+      <point x="0.0" y="-14.0" />
+      <point x="330.0" y="59.0" />
+      <point x="797.25" y="59.0" />
+      <point x="797.25" y="49.0" />
+      <point x="517.03125" y="49.0" />
+      <point x="34.0" y="14.0" />
+    </edge>
+    <edge source="java.util.IdentityHashMap" target="java.util.Map" relationship="REALIZATION">
+      <point x="0.0" y="-14.0" />
+      <point x="974.5" y="59.0" />
+      <point x="797.25" y="59.0" />
+      <point x="797.25" y="49.0" />
+      <point x="517.03125" y="49.0" />
+      <point x="34.0" y="14.0" />
+    </edge>
+    <edge source="java.util.LinkedHashMap" target="java.util.Map" relationship="REALIZATION">
+      <point x="56.75" y="-14.0" />
+      <point x="854.0" y="135.0" />
+      <point x="846.5" y="135.0" />
+      <point x="846.5" y="59.0" />
+      <point x="797.25" y="59.0" />
+      <point x="797.25" y="49.0" />
+      <point x="517.03125" y="49.0" />
+      <point x="34.0" y="14.0" />
+    </edge>
+    <edge source="java.util.HashMap" target="java.util.Map" relationship="REALIZATION">
+      <point x="0.0" y="-14.0" />
+      <point x="748.0" y="59.0" />
+      <point x="797.25" y="59.0" />
+      <point x="797.25" y="49.0" />
+      <point x="517.03125" y="49.0" />
+      <point x="34.0" y="14.0" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic" zoom="0.7487528769558631" showDependencies="false" x="530.7031286626885" y="171.54395346306757" />
+  <SelectedNodes>
+    <node>java.util.SortedMap</node>
+  </SelectedNodes>
+  <Categories />
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+

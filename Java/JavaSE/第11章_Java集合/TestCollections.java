@@ -155,29 +155,44 @@ public class TestCollections {
     public void testSet(){
         /**** Set */
         /****** HashSet */
-        Set<TestHash> set = new HashSet<>();
-        set.add(new TestHash(1,1, true));
-        set.add(new TestHash(2,2, true));
-        set.add(new TestHash(3,3, false));
+        System.out.println("------------HashSet-------------");
+        HashSet<TestHash> set = new HashSet<>();
+        set.add(new TestHash(11, true));
+        set.add(new TestHash(21, true));
+        set.add(new TestHash(51, true));
+        set.add(new TestHash(31, true));
+        set.add(new TestHash(31, false));
+        System.out.println(set);  // [TestHash{x=31}, TestHash{x=31}, TestHash{x=11}, TestHash{x=21}, TestHash{x=51}]
 
         /****** LinkedHashSet */
+        System.out.println("-------------LinkedHashSet------------");
         LinkedHashSet linkedHashSet = new LinkedHashSet();
+        linkedHashSet.add(new TestHash(11, true));
+        linkedHashSet.add(new TestHash(21, true));
+        linkedHashSet.add(new TestHash(51, true));
+        linkedHashSet.add(new TestHash(31, true));
+        linkedHashSet.add(new TestHash(31, false));
+        System.out.println(linkedHashSet);// [TestHash{x=11}, TestHash{x=21}, TestHash{x=51}, TestHash{x=31}, TestHash{x=31}]
 
         /****** TreeSet */
-        TreeSet<TestHash> set1 = new TreeSet<>();
-        set.add(new TestHash(1,1, true));
-        set.add(new TestHash(2,2, true));
-        set.add(new TestHash(3,3, false));
-
-//
-//Comparator comparator()
-//Object first()
-//Object last()
-//Object lower(Object e)
-//Object higher(Object e)
-//SortedSet subSet(fromElement, toElement)
-//SortedSet headSet(toElement) SortedSet tailSet(fromElement)
-
-        System.out.println(set1);
+        System.out.println("-------------TreeSet------------");
+        TreeSet<TestHash> treeSet = new TreeSet<>();
+        treeSet.add(new TestHash(5, true));
+        treeSet.add(new TestHash(3, true));
+        treeSet.add(new TestHash(2, true));
+        treeSet.add(new TestHash(31, true));
+        treeSet.add(new TestHash(31, false));
+        // 自动排序：按照对象的compareTo方法，[TestHash{x=2}, TestHash{x=3}, TestHash{x=5}, TestHash{x=31}]
+        // 注意：TreeSet根据重写的compareTo方法判断是否相等，如果TestHash只根据x判断，那么new TestHash(31, false)不能插入set中
+        System.out.println(treeSet);
+        System.out.println(treeSet.comparator());
+        System.out.println(treeSet.first()); // 第一个：TestHash{x=2}
+        System.out.println(treeSet.last()); // 最后一个：TestHash{x=31}
+        System.out.println(treeSet.lower(new TestHash(6, true)));// 小于6的第一个：TestHash{x=5}
+        System.out.println(treeSet.higher(new TestHash(4, true))); // 大于4的第一个：TestHash{x=5}
+        // 分隔[x=2, x=5)：[TestHash{x=2}, TestHash{x=3}]
+        System.out.println(treeSet.subSet(new TestHash(2, true), new TestHash(5, true)));
+        System.out.println(treeSet.headSet(new TestHash(5, true)));// 小于5的所有：[TestHash{x=2}, TestHash{x=3}]
+        System.out.println(treeSet.tailSet(new TestHash(5, true)));// 大于等于5的所有：[TestHash{x=5}, TestHash{x=31}]
     }
 }

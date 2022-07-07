@@ -1,7 +1,7 @@
 
 public class TestHash implements Comparable{
-    private int x;
-    private boolean sortType;
+    int x;
+    boolean sortType;
 
     TestHash(int x, boolean sortType){
         this.x = x;

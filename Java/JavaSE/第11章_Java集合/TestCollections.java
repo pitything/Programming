@@ -6,6 +6,7 @@ public class TestCollections {
     @Test
     public void testCollections(){
         /** Collections工具类 */
+        /** 常用方法 **/
         List<Integer> collection1 = new ArrayList<>();
         // 1.添加
         collection1.add(3);
@@ -45,7 +46,7 @@ public class TestCollections {
         Collections.copy(collection1, collection2); // 将collection2中的内容复制到collection1中：[3, 3, 4, 2, 1]
         Collections.replaceAll(collection1, 2, 1);// 使用新值替换 List 对象的所有旧值：[5, 3, 4, 1, 1]
 
-
-        Collections.synchronizedList(collection2)
+        /** 同步方法 **/
+        Collections.synchronizedList(collection2);
     }
 }

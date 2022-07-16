@@ -1,6 +1,7 @@
 import org.junit.Test;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class TestMap {
     @Test
@@ -57,6 +58,7 @@ public class TestMap {
     public void testHashMap(){
         /*** HashMap ***/
         HashMap<String, Object> hashMap = new HashMap<>();
+        hashMap.put("aa", 11);
 
         /*** LinkedHashMap ***/
         LinkedHashMap<String, Object> linkedHashMap = new LinkedHashMap<>();
@@ -68,5 +70,14 @@ public class TestMap {
                 return 0;
             }
         });
+
+        /** HashTable */
+        Hashtable<String, Object> hashtable = new Hashtable<>();
+
+        /** ConcurrentHashMap */
+        ConcurrentHashMap<String, Object> concurrentHashMap = new ConcurrentHashMap<>();
+
+
+
     }
 }

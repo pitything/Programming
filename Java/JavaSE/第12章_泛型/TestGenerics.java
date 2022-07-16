@@ -1,60 +1,62 @@
+import org.junit.Test;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class TestGenerics {
-    public static void main (String[] args){
-        GenericsStruction<String> genericsStruction = new GenericsStruction();
-        System.out.println(genericsStruction.getT());
-        GenericsStruction genericsStruction1 = new GenericsStruction();
-        System.out.println(genericsStruction1.getT());
+    @Test
+    public void testGenerics(){
+        /** 泛型 */
+        ArrayList<String> list = new ArrayList<>();
 
+        /** 自定义泛型 */
+        /*** 泛型类/泛型接口*/
+        MyGenericsInt<String> myGenericsInt;
+        MyGenericsClass<String> myGenericsClass;
+        MyGenericsClass myGenericsClass1;
 
-
-
-    }
-
-    public static void test(){
-        List<String> list1= null;
-        List<Object> list2 = null;
-        List<?> list = null;
-
-        list = list1;
-
-        print(list1);
+        // 泛型不同的引用不能相互赋值
+        ArrayList<String> list1 = new ArrayList<String>(){{add("aa");add("bb");}};
+        ArrayList<?> list3 = new ArrayList<>();
+        list3 = list1;
+//        list3.add("aaa");
+        list3.add(null);
 
     }
 
-    public static void print(List<?> list){
-        list.forEach(item -> System.out.println(item));
+    /*** 泛型方法 */
+    public <K> String getK(K k) throws Exception{
+        return "k";
     }
 }
 
+interface MyGenericsInt<T>{}
 
-class GenericsStruction<T>{
+class MyGenericsClass<T>{
     T t;
+
 //   static T t; 泛型不能用static修饰
-    static String t1;
+//    static T t1;
+//    public static T returnT(T tt){
+//        return tt;
+//    }
 
-    GenericsStruction(){};
+    MyGenericsClass(){};
 
-    GenericsStruction(T t){
-        this.t = t;
-    }
-
-    public T getT(){
-        return t;
-    }
-
-    public <T extends Animal> void setT(T t){
+    public <T extends Animal> void setT(T t) throws Exception{
         System.out.println(t);
     }
-
 }
 
-class Creature{}
+// 1.子类不保留父类泛型：擦除泛型
+class MyGenericsClass2 extends MyGenericsClass{}
+// 2.子类不保留父类泛型：定义新泛型
+class MyGenericsClass3<T> extends MyGenericsClass{}
+// 3.子类保留父类泛型
+class MyGenericsClass4<T> extends MyGenericsClass<T>{}
+// 4.子类保留父类泛型：可拓展
+class MyGenericsClass5<K extends T, T> extends MyGenericsClass<T>{}
 
-class Person2 extends Creature{}
-
+class Creature{
+}
 class Animal extends Creature{}
-
-class Dog extends Animal{}

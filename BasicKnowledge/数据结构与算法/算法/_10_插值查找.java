@@ -2,19 +2,14 @@ package 算法;
 
 public class _10_插值查找 {
     public static void main(String[] args) {
-//        int[] arr = new int[100];
-//        for (int i = 0; i < 100; i++) {
-//            arr[i] = i + 1;
-//        }
         int arr[] = {1, 8, 10, 89, 1000, 1000, 1234};
         int index = insertValueSearch(arr, 0, arr.length - 1, 1234);
-        System.out.println("index=" + index);
-        //System.out.println(Arrays.toString(arr));
+        System.out.println("index = " + index);
     }
 
-    //编写插值查找算法
-    //说明：插值查找算法，也要求数组是有序的
     /**
+     * 插值查找算法
+     * 说明：插值查找算法，也要求数组是有序的
      * @return 如果找到，就返回对应的下标，如果没有找到，返回- 1
      * @paramarr 数组
      * @paramleft 左边索引

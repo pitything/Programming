@@ -1,9 +1,8 @@
-package 算法;
 
 import java.util.Arrays;
 
 public class _1_冒泡排序 {
-    private static int count = 100000;
+    private static int count = 10;
 
     public static void main(String[] args) {
         int[] arr = new int[count];
@@ -20,11 +19,12 @@ public class _1_冒泡排序 {
 //        _4_希尔排序.shellSort(arr);
 //        _4_希尔排序.shellSort2(arr);
 //        _5_快速排序.quickSort(arr, 0 , arr.length - 1);
-        _6_归并排序.mergeSort(arr, 0, arr.length - 1, new int[arr.length]);
+//        _6_归并排序.mergeSort(arr, 0, arr.length - 1, new int[arr.length]);
 //        _7_基数排序.radixSort(arr);
+        _12_堆排序.dui(arr);
         System.out.println("耗时：" + (System.currentTimeMillis() - beg));
         System.out.println("排序后");
-//        System.out.println(Arrays.toString(arr));
+        System.out.println(Arrays.toString(arr));
     }
 
     public static void bubbleSort(int[] arr) {

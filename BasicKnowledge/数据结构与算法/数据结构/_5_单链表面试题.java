@@ -1,10 +1,12 @@
 package 数据结构;
 
 import java.util.Stack;
+import 数据结构.HeroNode;
+import 数据结构.SingleLinkedList;
 
 public class _5_单链表面试题 {
     public static void main(String[] args) {
-        HeroNode hero1 = new HeroNode(1, "宋江", "及时雨");
+        数据结构.HeroNode hero1 = new HeroNode(1, "宋江", "及时雨");
         HeroNode hero2 = new HeroNode(2, "卢俊义", "玉麒麟");
         HeroNode hero3 = new HeroNode(3, "吴用", "智多星");
         HeroNode hero4 = new HeroNode(4, "林冲", "豹子头");

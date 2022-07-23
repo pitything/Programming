@@ -21,7 +21,7 @@ public class _1_冒泡排序 {
 //        _5_快速排序.quickSort(arr, 0 , arr.length - 1);
 //        _6_归并排序.mergeSort(arr, 0, arr.length - 1, new int[arr.length]);
 //        _7_基数排序.radixSort(arr);
-        _12_堆排序.dui(arr);
+        _12_堆排序.heapSort(arr);
         System.out.println("耗时：" + (System.currentTimeMillis() - beg));
         System.out.println("排序后");
         System.out.println(Arrays.toString(arr));

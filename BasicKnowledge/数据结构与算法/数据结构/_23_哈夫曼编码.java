@@ -6,6 +6,10 @@ public class _23_哈夫曼编码 {
     static Map<Byte, String> byteMap = new HashMap<>();
 
     public static void main(String[] args) throws Exception {
+        List<Integer> aa = new LinkedList<>();
+        aa.add(2);
+        System.out.println(aa.get(0));
+
         String s = "i like like like java do you like a java";
         System.out.println("压缩前：" + s);
         System.out.println("长度：" + s.length());
@@ -38,37 +42,6 @@ public class _23_哈夫曼编码 {
             byte[] res = decode(byteMap2, hfmBytes2);
             System.out.println("解压缩后，长度：" + res.length);
             os.write(res);
-        }
-    }
-
-    /**
-     *@paramsrcFile 你传入的希望压缩的文件的全路径
-     *@paramdstFile 我们压缩后将压缩文件放到哪个目录
-     */
-    public static void zipFile(){
-        OutputStream os=null;
-        ObjectOutputStream oos=null;
-        FileInputStream is=null;
-        try{
-            is=new FileInputStream("/Users/leon_chiang/Study/Github/Programming/BasicKnowledge/数据结构与算法/数据结构/resume.png");
-            byte[]b=new byte[is.available()];
-            is.read(b);
-            System.out.println(b.length);
-            byte[]huffmanBytes=getHfmCode(b);
-            System.out.println(huffmanBytes.length);
-//            os=new FileOutputStream(dstFile);
-//            oos=new ObjectOutputStream(os);
-//            oos.writeObject(huffmanBytes);
-        }catch(Exception e){
-            System.out.println(e.getMessage());
-        }finally{
-            try{
-                is.close();
-                oos.close();
-                os.close();
-            }catch(Exception e){
-                System.out.println(e.getMessage());
-            }
         }
     }
 

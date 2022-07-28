@@ -3,7 +3,7 @@ import java.util.List;
 import java.util.Stack;
 
 public class _17_二叉树遍历 {
-    public static List<Integer> res = new ArrayList<>();
+    public List<Integer> res = new ArrayList<>();
     public static void main(String[] args) {
         //创建需要的节点
         HeroNode2 root = new HeroNode2(1, "宋江");
@@ -23,11 +23,9 @@ public class _17_二叉树遍历 {
 //        System.out.println(preorderTraversal(root));
         System.out.println(preorderTraversal2(root));
         System.out.println("中序遍历");
-        res = new ArrayList<>();
 //        System.out.println(inorderTraversal(root));// 2 , 1 , 5 , 3 , 4
         System.out.println(inorderTraversal2(root));// 2 , 1 , 5 , 3 , 4
         System.out.println("后序遍历");
-        res = new ArrayList<>();
 //        System.out.println(postorderTraversal(root));// 2 , 5 , 4 , 3 , 1
         System.out.println(postorderTraversal2(root));// 2 , 5 , 4 , 3 , 1
     }
@@ -35,7 +33,7 @@ public class _17_二叉树遍历 {
     /**
      * 前序遍历-递归
      */
-    public static List<Integer> preorderTraversal(HeroNode2 root) {
+    public List<Integer> preorderTraversal(HeroNode2 root) {
         if(root == null) return res;
         res.add(root.no);
         preorderTraversal(root.left);
@@ -46,7 +44,7 @@ public class _17_二叉树遍历 {
     /**
      * 中序遍历-递归
      */
-    public static List<Integer> inorderTraversal(HeroNode2 root){
+    public List<Integer> inorderTraversal(HeroNode2 root){
         if(root == null) return res;
         inorderTraversal(root.left);
         res.add(root.no);
@@ -57,7 +55,7 @@ public class _17_二叉树遍历 {
     /**
      * 后序遍历-递归
      */
-    public static List<Integer> postorderTraversal(HeroNode2 root){
+    public List<Integer> postorderTraversal(HeroNode2 root){
         if(root == null) return res;
         postorderTraversal(root.left);
         postorderTraversal(root.right);

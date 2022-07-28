@@ -2,9 +2,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class _18_二叉树查找 {
-    public static List<Integer> res = new ArrayList<>();
-    public static HeroNode2 resNode;
-    public static boolean found = false;
+    public List<Integer> res = new ArrayList<>();
+    public HeroNode2 resNode;
+    public boolean found = false;
     public static void main(String[] args) {
         //创建需要的节点
         HeroNode2 root = new HeroNode2(1, "宋江");
@@ -21,20 +21,17 @@ public class _18_二叉树查找 {
         //   2   3
         //      5 4
         System.out.println("前序查找");// 1 , 2 , 3 , 5 , 4
-        found = false;
-        System.out.println(preorderSearch(root, 2));
+        System.out.println(new _18_二叉树查找().preorderSearch(root, 2));
         System.out.println("中序查找");
-        found = false;
-        System.out.println(inorderSearch(root, 2));// 2 , 1 , 5 , 3 , 4
+        System.out.println(new _18_二叉树查找().inorderSearch(root, 2));// 2 , 1 , 5 , 3 , 4
         System.out.println("后序查找");
-        found = false;
-        System.out.println(postorderSearch(root, 2));// 2 , 5 , 4 , 3 , 1
+        System.out.println(new _18_二叉树查找().postorderSearch(root, 2));// 2 , 5 , 4 , 3 , 1
     }
 
     /**
      * 前序查找-递归
      */
-    public static HeroNode2 preorderSearch(HeroNode2 root, int no) {
+    public HeroNode2 preorderSearch(HeroNode2 root, int no) {
         if(root == null) return null;
         System.out.println("查找至：" + root);
         if(root.no == no) {
@@ -49,7 +46,7 @@ public class _18_二叉树查找 {
     /**
      * 中序查找-递归
      */
-    public static HeroNode2 inorderSearch(HeroNode2 root, int no){
+    public HeroNode2 inorderSearch(HeroNode2 root, int no){
         if(root == null) return null;
         if(!found) resNode = inorderSearch(root.left, no);
         System.out.println("查找至：" + root);
@@ -64,7 +61,7 @@ public class _18_二叉树查找 {
     /**
      * 后序查找-递归
      */
-    public static HeroNode2 postorderSearch(HeroNode2 root, int no){
+    public HeroNode2 postorderSearch(HeroNode2 root, int no){
         if(root == null) return null;
         if(!found) resNode = postorderSearch(root.left, no);
         if(!found) resNode= postorderSearch(root.right, no);

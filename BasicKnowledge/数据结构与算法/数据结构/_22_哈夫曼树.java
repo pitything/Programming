@@ -6,7 +6,7 @@ import java.util.List;
 public class _22_哈夫曼树 {
     public static void main(String[] args) {
         int arr[] = {13, 7, 8, 3, 29, 6, 1};
-        System.out.println(_17_二叉树遍历.preorderTraversal(createHuffmanTree(arr)));
+        System.out.println(new _17_二叉树遍历().preorderTraversal(createHuffmanTree(arr)));
     }
 
     /**

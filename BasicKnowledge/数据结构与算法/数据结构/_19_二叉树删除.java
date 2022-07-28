@@ -2,9 +2,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class _19_二叉树删除 {
-    public static List<Integer> res = new ArrayList<>();
-    public static HeroNode2 resNode;
-    public static boolean delete = false;
+    public List<Integer> res = new ArrayList<>();
+    public HeroNode2 resNode;
+    public boolean delete = false;
     public static void main(String[] args) {
         //创建需要的节点
         HeroNode2 root = new HeroNode2(1, "宋江");
@@ -20,17 +20,16 @@ public class _19_二叉树删除 {
         //     1
         //   2   3
         //      5 4
-        System.out.println(_17_二叉树遍历.preorderTraversal(root));
-        _17_二叉树遍历.res = new ArrayList<>();
+        System.out.println(new _17_二叉树遍历().preorderTraversal(root));
         System.out.println("二叉树删除");// 1 , 2 , 3 , 5 , 4
-        System.out.println(preorderSearch(root, 3));
-        System.out.println(_17_二叉树遍历.preorderTraversal(root));
+        System.out.println(new _19_二叉树删除().preorderDelete(root, 3));
+        System.out.println(new _17_二叉树遍历().preorderTraversal(root));
     }
 
     /**
      * 二叉树删除-递归
      */
-    public static boolean preorderSearch(HeroNode2 root, int no) {
+    public boolean preorderDelete(HeroNode2 root, int no) {
         if(root == null) return false;
         if(root.left != null && root.left.no == no) {
             root.left = null;
@@ -42,8 +41,8 @@ public class _19_二叉树删除 {
             delete = true;
             return delete;
         }
-        if(!delete) delete = preorderSearch(root.left, no);
-        if(!delete) delete = preorderSearch(root.right, no);
+        if(!delete) delete = preorderDelete(root.left, no);
+        if(!delete) delete = preorderDelete(root.right, no);
         return delete;
     }
 }

@@ -4,10 +4,10 @@ public class _4_单链表代码实现 {
     public static void main(String[] args) {
         //进行测试
         //先创建节点
-        HeroNode hero1 = new HeroNode(1, "宋江", "及时雨");
-        HeroNode hero2 = new HeroNode(2, "卢俊义", "玉麒麟");
-        HeroNode hero3 = new HeroNode(3, "吴用", "智多星");
-        HeroNode hero4 = new HeroNode(4, "林冲", "豹子头");
+        HeroNode1 hero1 = new HeroNode1(1, "宋江", "及时雨");
+        HeroNode1 hero2 = new HeroNode1(2, "卢俊义", "玉麒麟");
+        HeroNode1 hero3 = new HeroNode1(3, "吴用", "智多星");
+        HeroNode1 hero4 = new HeroNode1(4, "林冲", "豹子头");
 
         //创建要给链表
         SingleLinkedList singleLinkedList = new SingleLinkedList();
@@ -26,8 +26,8 @@ public class _4_单链表代码实现 {
         singleLinkedList.list();
 
         //测试修改节点的代码
-        HeroNode newHeroNode = new HeroNode(2, "小卢", "玉麒麟~~");
-        singleLinkedList.update(newHeroNode);
+        HeroNode1 newHeroNode1 = new HeroNode1(2, "小卢", "玉麒麟~~");
+        singleLinkedList.update(newHeroNode1);
         System.out.println("修改后的链表情况~~");
         singleLinkedList.list();
 
@@ -42,14 +42,14 @@ public class _4_单链表代码实现 {
 //定义SingleLinkedList 管理我们的英雄
 class SingleLinkedList {
     //先初始化一个头节点, 头节点不要动, 不存放具体的数据
-    public HeroNode head = new HeroNode(0, "", "");
+    public HeroNode1 head = new HeroNode1(0, "", "");
 
     //添加节点到单向链表，不考虑编号顺序
     // 1. 找到当前链表的最后节点
     // 2. 将最后这个节点的next 指向 新的节点
-    public void add(HeroNode heroNode) {
+    public void add(HeroNode1 heroNode) {
         //因为head节点不能动，因此我们需要一个辅助遍历 temp
-        HeroNode temp = head;
+        HeroNode1 temp = head;
         //遍历链表，找到最后
         while (true) {
             //找到链表的最后
@@ -66,10 +66,10 @@ class SingleLinkedList {
 
     //第二种方式在添加英雄时，根据排名将英雄插入到指定位置
     //(如果有这个排名，则添加失败，并给出提示)
-    public void addByNo(HeroNode heroNode) {
+    public void addByNo(HeroNode1 heroNode) {
         //因为头节点不能动，因此我们仍然通过一个辅助指针(变量)来帮助找到添加的位置
         //因为单链表，因为我们找的temp 是位于 添加位置的前一个节点，否则插入不了
-        HeroNode temp = head;
+        HeroNode1 temp = head;
         boolean flag = false;//flag标志添加的编号是否存在，默认为false
         while (true) {
             if (temp.next == null) {//说明temp已经在链表的最后
@@ -94,8 +94,8 @@ class SingleLinkedList {
     }
 
     //修改节点的信息, 根据no编号来修改，即no编号不能改.
-    // 1. 根据 new HeroNode  的 no 来修改即可
-    public void update(HeroNode newHeroNode) {
+    // 1. 根据 new HeroNode1  的 no 来修改即可
+    public void update(HeroNode1 newHeroNode) {
         //判断是否空
         if (head.next == null) {
             System.out.println("链表为空~");
@@ -103,7 +103,7 @@ class SingleLinkedList {
         }
         //找到需要修改的节点, 根据no编号
         //定义一个辅助变量
-        HeroNode temp = head;
+        HeroNode1 temp = head;
         boolean flag = false;//表示是否找到该节点
         while (true) {
             if (temp.next == null) {
@@ -129,7 +129,7 @@ class SingleLinkedList {
     // 1 .head 不能动，因此我们需要一个temp辅助节点找到待删除节点的前一个节点
     // 2. 说明我们在比较时，是temp.next.no 和 需要删除的节点的no比较
     public void del(int no) {
-        HeroNode temp = head;
+        HeroNode1 temp = head;
         boolean flag = false;// 标志是否找到待删除节点的
         while (true) {
             if (temp.next == null) {//已经到链表的最后
@@ -159,7 +159,7 @@ class SingleLinkedList {
             return;
         }
         //因为头节点，不能动，因此我们需要一个辅助变量来遍历
-        HeroNode temp = head.next;
+        HeroNode1 temp = head.next;
         while (true) {
             //判断是否到链表最后
             if (temp == null) {
@@ -174,14 +174,14 @@ class SingleLinkedList {
 }
 
 //定义HeroNode，每个HeroNode对象就是一个节点
-class HeroNode {
+class HeroNode1 {
     public int no; // 编号
     public String name;// 名称
     public String nickname;// 昵称
-    public HeroNode next;//指向下一个节点
+    public HeroNode1 next;//指向下一个节点
 
     //构造器
-    public HeroNode(int no, String name, String nickname) {
+    public HeroNode1(int no, String name, String nickname) {
         this.no = no;
         this.name = name;
         this.nickname = nickname;
@@ -190,6 +190,6 @@ class HeroNode {
     //为了显示方法，我们重新toString
     @Override
     public String toString() {
-        return "HeroNode [no=" + no + ",name=" + name + ",nickname=" + nickname + "]";
+        return "HeroNode1 [no=" + no + ",name=" + name + ",nickname=" + nickname + "]";
     }
 }

@@ -1,22 +1,51 @@
-import java.util.Arrays;
+package 算法;
+
+import java.util.*;
 
 public class _16_KMP算法 {
     public static void main(String[] args) {
         //测试暴力匹配算法
-        String str1 = "ABCDABD";
+        String str1 = "hello";
+        String str2 = "ll";
 //        String str1 = "BBC ABCDAB ABCDABCDABDE";
+//        String str2 = "ABCDABD";
+//        String str2 = "acaacac";
 //        String str2 = "AAABAAAA";
-//        String str2 = "AAABAAAC";
-        String str2 = "ABCDABD";
+        System.out.println(strStr(str1, str2));
         System.out.println(str1.indexOf(str2));
         int index = violenceMatch(str1, str2);
         System.out.println("index = " + index);
 
-        int[] next = kmpNext(str2);//[ 0 , 1 , 2 , 0 ]
+        int[] next = kmpNext(str2);// [0, 0, 0, 0, 1, 2, 0]
         System.out.println("next = " + Arrays.toString(next));
 
         index = kmpSearch(str1, str2, next);
         System.out.println("index = " + index);
+    }
+
+    public static int strStr(String haystack, String needle) {
+        int[] next = new int[needle.length()];
+        int j = 0;
+        for(int i = 1; i < needle.length(); i++){
+            while(j > 0 && needle.charAt(j) != needle.charAt(i)){
+                j = next[j - 1];
+            }
+            if(needle.charAt(j) == needle.charAt(i)){
+                next[i] = ++j;
+            }
+        }
+
+        j = 0;
+        for(int i = 0; i < haystack.length(); i++){
+            while(j > 0 && needle.charAt(j) != haystack.charAt(i)){
+                j = next[j - 1];
+            }
+            if(needle.charAt(j) == haystack.charAt(i)){
+                j++;
+            }
+            return i - j + 1;
+        }
+        return -1;
     }
 
     /**
@@ -29,7 +58,7 @@ public class _16_KMP算法 {
         int i = 0;//i索引指向s1
         int j = 0;//j索引指向s2
         while (i < str1.length() && j < str2.length()) {// 保证匹配时，不越界
-            if (str1.charAt(i) == str1.charAt(j)) {//匹配ok
+            if (str1.charAt(i) == str2.charAt(j)) {//匹配ok
                 i++;
                 j++;
             } else {
@@ -44,20 +73,26 @@ public class _16_KMP算法 {
     }
 
     /**
-     * 获取到一个字符串(子串)的部分匹配值：ABCDABD -> [0, 0, 0, 0, 1, 0, 0]
+     * 获取到一个字符串(子串)的部分匹配值：ABCDABD -> [0, 0, 0, 0, 1, 2, 0]
      */
     public static int[] kmpNext(String dest) {
         int[] next = new int[dest.length()];
-        // 第一个字符为0可以确定
-        int j = 0;
-        for (int i = 1; i < dest.length(); i++) {
-            //当dest.charAt(i) != dest.charAt(j) ，我们需要从next[j-1]获取新的j
-            // 此处循环过后有条件导致break：j=0；j = 新加入字符上次出现的位置
-            while (j > 0 && dest.charAt(i) != dest.charAt(j)) {
-                // 此处的目的是将j重置为第j-1个匹配的字符的匹配长度，如 AABAAA，将最后一个A的j设置为第二个A的j，而不是直接用j=0
+        int j = 0;// j：匹配字符个数；前缀末尾
+        for (int i = 1; i < dest.length(); i++) {// i：后缀末尾
+            // 如果前几个字符匹配（j>0），第i个字符不匹配，就将第（前一个字符的匹配个数-1）位置的字符 的匹配个数来重置j
+            // 上述目的：将j置为0；或者如果出现AABAAA这种情况，相当于把第2个A的匹配个数赋给了最后一个A
+            // 如 acaacac -> [0, 0, 1, 1, 2, 3, 2]：求最后一个c的next值，
+            // acaacac
+            // acac
+            // 此时j为3，意味着c之前已经有3个匹配字符，即 acaacac 前3个字符与 子串 acac 的前3个字符相等
+            // 如果第3个字符a的next值为0，说明前3个字符不存在更小的对称子串，要重新开始匹配；next值=0
+            // 如果第3个字符a的next值不为0，如例为1，说明 aca 字符串还存在长度为1的对称子串 a，
+            // 用c和第1个后面的字符串匹配，相当于把后缀切小了，由acac变成了ac，如果匹配上，就++，即j=1+1=2；匹配不上继续上一步操作直至next值=0
+            while (j > 0 && dest.charAt(j) != dest.charAt(i)) {
                 j = next[j - 1];
             }
-            if (dest.charAt(i) == dest.charAt(j)) {
+            // 如果匹配，就将个数+1
+            if (dest.charAt(j) == dest.charAt(i)) {
                 next[i] = ++j;
             }
         }
@@ -66,14 +101,15 @@ public class _16_KMP算法 {
 
     /**
      * kmp搜索算法
-     * @return 如果是- 1 就是没有匹配到，否则返回第一个匹配的位置
-     * @paramstr1 源字符串
-     * @paramstr2 子串
-     * @paramnext 部分匹配表, 是子串对应的部分匹配表
+     * @return 如果是 -1 就是没有匹配到，否则返回第一个匹配的位置
+     * @param str1 源字符串
+     * @param str2 子串
+     * @param next 部分匹配表, 是子串对应的部分匹配表
      */
     public static int kmpSearch(String str1, String str2, int[] next) {
+        int j = 0;
         //遍历
-        for (int i = 0, j = 0; i < str1.length(); i++) {
+        for (int i = 0; i < str1.length(); i++) {
             //需要处理 str1 .charAt(i) ！=str2 .charAt(j), 去调整j的大小
             while (j > 0 && str1.charAt(i) != str2.charAt(j)) {
                 j = next[j - 1];

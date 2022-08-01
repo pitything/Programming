@@ -1,3 +1,4 @@
+package 算法;
 
 public class _2_选择排序 {
     public static void selectSort(int[] arr) {

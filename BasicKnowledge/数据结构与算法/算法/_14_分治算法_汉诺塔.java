@@ -1,3 +1,5 @@
+package 算法;
+
 public class _14_分治算法_汉诺塔 {
     public static void main(String[] args) {
         hanoiTower(3, 'A', 'B', 'C');

@@ -1,3 +1,5 @@
+package 数据结构;
+
 public class _21_线索二叉树 {
     public static void main(String[] args) {
         //测试一把中序线索二叉树的功能

@@ -1,3 +1,5 @@
+package 数据结构;
+
 import java.util.ArrayList;
 
 public class _24_二叉排序树 {

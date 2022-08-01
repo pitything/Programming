@@ -1,3 +1,5 @@
+package 算法;
+
 public class _15_动态规划算法 {
     public static void main(String[] args) {
         int[] w = {1, 4, 3};                //物品的重量

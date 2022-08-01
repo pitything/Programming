@@ -1,3 +1,5 @@
+package 数据结构;
+
 public class _25_平衡二叉树<T> {
     public static void main(String[] args) {
         int[] arr = {4, 3, 6, 5, 7, 8};

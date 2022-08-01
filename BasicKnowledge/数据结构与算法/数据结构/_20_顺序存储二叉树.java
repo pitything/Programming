@@ -1,3 +1,5 @@
+package 数据结构;
+
 public class _20_顺序存储二叉树 {
     public static void main(String[] args) {
         int[] arr = {1, 2, 3, 4, 5, 6, 7};

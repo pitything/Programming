@@ -1,9 +1,5 @@
 package 数据结构;
 
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Stack;
-
 public class _7_约瑟夫问题 {
     public static void main(String[] args) {
         // 测试一把看看构建环形链表，和遍历是否ok

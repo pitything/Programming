@@ -1,7 +1,5 @@
 package 算法;
 
-import java.util.Arrays;
-
 public class _5_快速排序 {
     public static void quickSort(int[] arr, int left, int right) {
         int l = left;//左下标

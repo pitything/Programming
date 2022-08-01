@@ -1,6 +1,7 @@
 import java.util.*;
 
 public class _17_贪心算法 {
+
     public static void main(String[] args) {
         // 存放广播电台
         HashMap<String, HashSet<String>> broadcasts = new HashMap<String, HashSet<String>>();
@@ -15,7 +16,7 @@ public class _17_贪心算法 {
         System.out.println("得到的选择结果是" + res);//[K 1 ,K 2 ,K 3 ,K 5 ]
     }
 
-    public static void prepareData(HashSet<String> allAreas, HashMap<String, HashSet<String>> broadcasts){
+    public static void prepareData(HashSet<String> allAreas, HashMap<String, HashSet<String>> broadcasts) {
         //将各个电台放入到broadcasts
         HashSet<String> hashSet1 = new HashSet<>();
         hashSet1.add("北京");
@@ -58,10 +59,11 @@ public class _17_贪心算法 {
 
     /**
      * 贪心算法
+     *
      * @param allAreas
      * @param broadcasts
      */
-    public static List<String> greedyAlgorithm(HashSet<String> allAreas, HashMap<String, HashSet<String>> broadcasts){
+    public static List<String> greedyAlgorithm(HashSet<String> allAreas, HashMap<String, HashSet<String>> broadcasts) {
         // 存放选择的电台集合
         ArrayList<String> res = new ArrayList<>();
         // 拥有未覆盖的地区数量最多的电台

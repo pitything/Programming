@@ -1,3 +1,5 @@
+package 数据结构;
+
 import java.util.Scanner;
 
 public class _16_哈希表 {

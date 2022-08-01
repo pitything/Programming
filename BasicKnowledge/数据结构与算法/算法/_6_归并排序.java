@@ -1,7 +1,5 @@
 package 算法;
 
-import java.util.Arrays;
-
 public class _6_归并排序 {
     /**
      * 分治思想：分+合方法

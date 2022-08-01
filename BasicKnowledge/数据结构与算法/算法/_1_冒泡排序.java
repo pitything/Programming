@@ -1,3 +1,4 @@
+package 算法;
 
 import java.util.Arrays;
 
@@ -13,14 +14,14 @@ public class _1_冒泡排序 {
 //        System.out.println(Arrays.toString(arr));
         long beg = System.currentTimeMillis();
 
-//        _1_冒泡排序.bubbleSort(arr);
-//        _2_选择排序.selectSort(arr);
-//        _3_插入排序.insertSort(arr);
-//        _4_希尔排序.shellSort(arr);
-//        _4_希尔排序.shellSort2(arr);
-//        _5_快速排序.quickSort(arr, 0 , arr.length - 1);
-//        _6_归并排序.mergeSort(arr, 0, arr.length - 1, new int[arr.length]);
-//        _7_基数排序.radixSort(arr);
+        _1_冒泡排序.bubbleSort(arr);
+        _2_选择排序.selectSort(arr);
+        _3_插入排序.insertSort(arr);
+        _4_希尔排序.shellSort(arr);
+        _4_希尔排序.shellSort2(arr);
+        _5_快速排序.quickSort(arr, 0 , arr.length - 1);
+        _6_归并排序.mergeSort(arr, 0, arr.length - 1, new int[arr.length]);
+        _7_基数排序.radixSort(arr);
         _12_堆排序.heapSort(arr);
         System.out.println("耗时：" + (System.currentTimeMillis() - beg));
         System.out.println("排序后");

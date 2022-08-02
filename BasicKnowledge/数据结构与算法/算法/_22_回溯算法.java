@@ -3,9 +3,8 @@ package 算法;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
 
-public class _22_马踏棋盘算法 {
+public class _22_回溯算法 {
     private static int X;// 棋盘的列数
     private static int Y;// 棋盘的行数
     // 创建一个数组，标记棋盘的各个位置是否被访问过

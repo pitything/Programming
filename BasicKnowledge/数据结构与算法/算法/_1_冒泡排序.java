@@ -3,7 +3,7 @@ package 算法;
 import java.util.Arrays;
 
 public class _1_冒泡排序 {
-    private static int count = 10;
+    private static int count = 100000;
 
     public static void main(String[] args) {
         int[] arr = new int[count];
@@ -14,15 +14,18 @@ public class _1_冒泡排序 {
 //        System.out.println(Arrays.toString(arr));
         long beg = System.currentTimeMillis();
 
-        _1_冒泡排序.bubbleSort(arr);
-        _2_选择排序.selectSort(arr);
-        _3_插入排序.insertSort(arr);
-        _4_希尔排序.shellSort(arr);
-        _4_希尔排序.shellSort2(arr);
-        _5_快速排序.quickSort(arr, 0 , arr.length - 1);
-        _6_归并排序.mergeSort(arr, 0, arr.length - 1, new int[arr.length]);
+        // arr = new int[]{488, 853, 901, 992, 991, 993, 338, 951, 968, 344};
+        // arr = new int[]{3,5,4,1,6,8,2,9,7};
+        // arr = new int[]{8,6,4,5,5,5,3,1};
+        // _1_冒泡排序.bubbleSort(arr);
+        // _2_选择排序.selectSort(arr);
+        // _3_插入排序.insertSort(arr);
+        // _4_希尔排序.shellSort(arr);
+        // _4_希尔排序.shellSort2(arr);
+        // _5_快速排序.quickSort(arr, 0 , arr.length - 1);
+        // _6_归并排序.mergeSort(arr, 0, arr.length - 1, new int[arr.length]);
         _7_基数排序.radixSort(arr);
-        _12_堆排序.heapSort(arr);
+        // _12_堆排序.heapSort(arr);
         System.out.println("耗时：" + (System.currentTimeMillis() - beg));
         System.out.println("排序后");
         System.out.println(Arrays.toString(arr));

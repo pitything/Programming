@@ -1,7 +1,4 @@
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+package Java.JavaSE.第10章_枚举类与注解;
 
 /**
  * 策略枚举

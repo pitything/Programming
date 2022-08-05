@@ -1,0 +1,36 @@
+@startuml
+interface List {
+    - int size()
+    ~ boolean isEmpty()
+    # boolean equals(Object o)
+    + {static} int hashCode()
+    + {abstract} int indexOf(Object o)
+    + boolean remove(Object o)
+    + boolean containsAll(Collection<?> c)
+}
+note left of List: List接口注释
+
+class ArrayList {
+    - {static} int DEFAULT_CAPACITY
+    - Object[] EMPTY_ELEMENTDATA
+    - Object[] DEFAULTCAPACITY_EMPTY_ELEMENTDATA
+    - int size
+
+    + int size()
+    + boolean isEmpty()
+    + boolean equals(Object o)
+    + {static} int hashCode()
+    + int indexOf(Object o)
+    + boolean remove(Object o)
+    + boolean containsAll(Collection<?> c)
+}
+note left of ArrayList: ArrayList类注释
+note right of ArrayList::"size"
+    List大小
+end note
+note right of ArrayList::"equals(Object o)"
+    equals方法
+end note
+
+List <|.. ArrayList
+@enduml

@@ -1,0 +1,37 @@
+@startuml
+abstract class Pizza
+class BigCheesePizza
+class BigPepperPizza
+class MiddleCheesePizza
+class MiddlePepperPizza
+class SmallCheesePizza
+class SmallPepperPizza
+abstract class AbsFactory
+class BigFactory
+class MiddleFactory
+class SmallFactory
+class Client
+
+Pizza <|-- BigCheesePizza
+Pizza <|-- BigPepperPizza
+Pizza <|-- MiddleCheesePizza
+Pizza <|-- MiddlePepperPizza
+Pizza <|-- SmallCheesePizza
+Pizza <|-- SmallPepperPizza
+
+BigCheesePizza <.. BigFactory
+BigPepperPizza <.. BigFactory
+MiddleCheesePizza <.. MiddleFactory
+MiddlePepperPizza <.. MiddleFactory
+SmallCheesePizza <.. SmallFactory
+SmallPepperPizza <.. SmallFactory
+
+BigFactory --|> AbsFactory
+MiddleFactory --|> AbsFactory
+SmallFactory --|> AbsFactory
+
+Client ..> Pizza
+BigFactory <.. Client
+MiddleFactory <.. Client
+SmallFactory <.. Client
+@enduml

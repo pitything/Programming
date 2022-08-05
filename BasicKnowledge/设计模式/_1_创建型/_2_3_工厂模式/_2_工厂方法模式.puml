@@ -1,0 +1,26 @@
+@startuml
+abstract class Pizza
+abstract class Factory
+class GreekPizza
+class CheesePizza
+class PepperPizza
+class GreekPizzaFactory
+class CheesePizzaFactory
+class PepperPizzaFactory
+class Client
+
+Pizza <|-- GreekPizza
+Pizza <|-- CheesePizza
+Pizza <|-- PepperPizza
+GreekPizza <.. GreekPizzaFactory
+CheesePizza <.. CheesePizzaFactory
+PepperPizza <.. PepperPizzaFactory
+GreekPizzaFactory --|> Factory
+CheesePizzaFactory --|> Factory
+PepperPizzaFactory --|> Factory
+
+Client ..> Pizza
+GreekPizzaFactory <.. Client
+CheesePizzaFactory <.. Client
+PepperPizzaFactory <.. Client
+@enduml

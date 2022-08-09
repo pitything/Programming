@@ -1,33 +1,30 @@
 package BasicKnowledge.设计模式._1_创建型._5_建造者模式;
 
-public class _2_建造者模式 {
+public class _1_建造者模式 {
     public static void main(String[] args) {
         //准备创建房子的指挥者
-        HouseDirector houseDirector = new HouseDirector();
-
-        //盖普通房子
-        HouseBuilder commonHouse = new CommonHouseBuilder();
+        House1Director houseDirector = new House1Director(new CommonHouse1Builder());
         //完成盖房子，返回产品(普通房子)
-        House house = houseDirector.constructHouse(commonHouse);
+        House1 house = houseDirector.constructHouse1();
 
         System.out.println("--------------------------");
         //盖高楼
-        HouseBuilder highBuilding = new HighHouseBuilder();
+        houseDirector = new House1Director(new HighHouse1Builder());
         //完成盖房子，返回产品(高楼)
-        House house2 = houseDirector.constructHouse(highBuilding);
+        House1 house2 = houseDirector.constructHouse1();
     }
 }
 
 //产品->Product
-class House {
+class House1 {
     public String base;
     public String wall;
     public String roof;
 }
 
 // 抽象的建造者
-abstract class HouseBuilder {
-    protected House house = new House();
+abstract class House1Builder {
+    protected House1 house = new House1();
 
     //将建造的流程写好, 抽象的方法
     public abstract void buildBasic();
@@ -35,12 +32,12 @@ abstract class HouseBuilder {
     public abstract void roofed();
 
     //建造房子好， 将产品(房子) 返回
-    public House buildHouse() {
+    public House1 buildHouse1() {
         return house;
     }
 }
 
-class CommonHouseBuilder extends HouseBuilder {
+class CommonHouse1Builder extends House1Builder {
     @Override
     public void buildBasic() {
         house.base = "普通房子打地基 5 米 ";
@@ -58,7 +55,7 @@ class CommonHouseBuilder extends HouseBuilder {
     }
 }
 
-class HighHouseBuilder extends HouseBuilder {
+class HighHouse1Builder extends House1Builder {
     @Override
     public void buildBasic() {
         house.roof = "高楼的打地基";
@@ -77,12 +74,17 @@ class HighHouseBuilder extends HouseBuilder {
 }
 
 //指挥者，这里去指定制作流程，返回产品
-class HouseDirector {
+class House1Director {
+    private House1Builder houseBuilder;
+
+    public House1Director(House1Builder houseBuilder) {
+        this.houseBuilder = houseBuilder;
+    }
     //如何处理建造房子的流程，交给指挥者
-    public House constructHouse(HouseBuilder houseBuilder) {
+    public House1 constructHouse1() {
         houseBuilder.buildBasic();
         houseBuilder.buildWalls();
         houseBuilder.roofed();
-        return houseBuilder.buildHouse();
+        return houseBuilder.buildHouse1();
     }
 }

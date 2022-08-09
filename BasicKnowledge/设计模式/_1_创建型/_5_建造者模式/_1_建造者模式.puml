@@ -1,0 +1,31 @@
+@startuml
+class House1 {
+    + String base;
+    + String wall;
+    + String roof;
+}
+
+abstract class House1Builder{
+    - House1 house
+    + {abstract} void buildBasic();
+    + {abstract} void buildWalls();
+    + {abstract} void roofed();
+    + House1 buildHouse1()
+}
+
+class CommonHouse1Builder
+class HighHouse1Builder
+
+class House1Director{
+    - House1Builder houseBuilder;
+    + House1Director(House1Builder houseBuilder)
+    + House1 constructHouse1()
+}
+
+House1 ..o House1Builder
+House1Builder <|-- CommonHouse1Builder
+House1Builder <|-- HighHouse1Builder
+House1Builder ..o House1Director
+House1 <.. House1Director
+
+@enduml

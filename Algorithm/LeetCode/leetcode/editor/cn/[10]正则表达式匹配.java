@@ -47,12 +47,12 @@ package Algorithm.LeetCode.leetcode.editor.cn;//给你一个字符串 s 和一�
 
 
 //leetcode submit region begin(Prohibit modification and deletion)
-class Solution {
+class Solution10 {
     public static void main(String[] args) {
-        // System.out.println(new Solution().isMatch("a", "."));
-        // System.out.println(new Solution().isMatch("a", "."));
-        System.out.println(new Solution().isMatch("aaa", "a*"));
-        // System.out.println(new Solution().isMatch("aaa", "ab*a*c*a"));
+        // System.out.println(new Solution10().isMatch("a", "."));
+        // System.out.println(new Solution10().isMatch("a", "."));
+        System.out.println(new Solution10().isMatch("aaa", "a*"));
+        // System.out.println(new Solution10().isMatch("aaa", "ab*a*c*a"));
     }
 
     public boolean isMatch(String s, String p) {

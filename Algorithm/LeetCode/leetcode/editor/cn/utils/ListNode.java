@@ -9,6 +9,7 @@ public class ListNode {
     public int val;
     public ListNode next;
 
+    public ListNode() {}
     public ListNode(int x) { val = x; }
 
     // 链表节点的构造函数

@@ -53,14 +53,14 @@ import Algorithm.LeetCode.leetcode.editor.cn.utils.ListNode;
 /**
  * Definition for singly-linked list.
  * public class ListNode {
- *     int val;
- *     ListNode next;
- *     ListNode() {}
- *     ListNode(int val) { this.val = val; }
- *     ListNode(int val, ListNode next) { this.val = val; this.next = next; }
+ * int val;
+ * ListNode next;
+ * ListNode() {}
+ * ListNode(int val) { this.val = val; }
+ * ListNode(int val, ListNode next) { this.val = val; this.next = next; }
  * }
  */
-class Solution {
+class Solution23 {
     public static void main(String[] args) {
         ListNode list1 = new ListNode(1);
         list1.next = new ListNode(4);
@@ -75,23 +75,24 @@ class Solution {
         lists[0] = list1;
         lists[1] = list2;
         lists[2] = list3;
-        System.out.println(new Solution().mergeKLists(lists));
+        System.out.println(new Solution23().mergeKLists(lists));
     }
 
     public ListNode mergeKLists(ListNode[] lists) {
         // return new Solution().mergeKLists1(lists);
-        return new Solution().mergeKLists2(lists);
+        return new Solution23().mergeKLists2(lists);
     }
 
     /**
      * 暴力解法
+     *
      * @param lists
      * @return
      */
     public ListNode mergeKLists1(ListNode[] lists) {
         if (lists == null || lists.length == 0) return null;
 
-        for(int i = 1; i < lists.length; i++){
+        for (int i = 1; i < lists.length; i++) {
             lists[i] = mergeTwoLists(lists[i - 1], lists[i]);
         }
         return lists[lists.length - 1];
@@ -99,49 +100,45 @@ class Solution {
 
     /**
      * 分治算法
+     *
      * @param lists
      * @return
      */
-    public ListNode mergeKLists2(ListNode[] lists){
-        if(lists.length == 0)
-            return null;
-        if(lists.length == 1)
-            return lists[0];
-        if(lists.length == 2){
-            return mergeTwoLists(lists[0],lists[1]);
-        }
+    public ListNode mergeKLists2(ListNode[] lists) {
+        if (lists.length == 0) return null;
+        if (lists.length == 1) return lists[0];
+        if (lists.length == 2) return mergeTwoLists(lists[0], lists[1]);
 
-        int mid = lists.length/2;
+        int mid = lists.length / 2;
         ListNode[] l1 = new ListNode[mid];
-        for(int i = 0; i < mid; i++){
+        for (int i = 0; i < mid; i++) {
             l1[i] = lists[i];
         }
 
-        ListNode[] l2 = new ListNode[lists.length-mid];
-        for(int i = mid,j=0; i < lists.length; i++,j++){
+        ListNode[] l2 = new ListNode[lists.length - mid];
+        for (int i = mid, j = 0; i < lists.length; i++, j++) {
             l2[j] = lists[i];
         }
 
-        return mergeTwoLists(mergeKLists(l1),mergeKLists(l2));
-
+        return mergeTwoLists(mergeKLists(l1), mergeKLists(l2));
     }
 
-    public ListNode mergeTwoLists(ListNode l1, ListNode l2){
+    public ListNode mergeTwoLists(ListNode l1, ListNode l2) {
         ListNode res = new ListNode(0);
         ListNode cur = res;
-        while(l1 != null && l2 != null){
-            if(l1.val > l2.val){
+        while (l1 != null && l2 != null) {
+            if (l1.val > l2.val) {
                 cur.next = l2;
                 cur = cur.next;
                 l2 = l2.next;
-            }else{
+            } else {
                 cur.next = l1;
                 cur = cur.next;
                 l1 = l1.next;
             }
         }
-        if(l1 == null) cur.next = l2;
-        if(l2 == null) cur.next = l1;
+        if (l1 == null) cur.next = l2;
+        if (l2 == null) cur.next = l1;
         return res.next;
     }
 }

@@ -12,7 +12,8 @@ public class TestThread4 {
 }
 
 class Print1to100 implements Runnable {
-    private int count = 1;
+    private int count = 0;
+    private String[] abc = new String[]{"a", "b", "c"};
 
     public void run() {
         while(true) {
@@ -20,7 +21,7 @@ class Print1to100 implements Runnable {
                 // 必须由锁对象调用
                 Print1to100.class.notify();
                 if(count <= 100) {
-                    System.out.println(Thread.currentThread().getName() + " ：" + count++);
+                    System.out.println(Thread.currentThread().getName() + " ：" + abc[(count++) % 3]);
                 }else{
                     break;
                 }

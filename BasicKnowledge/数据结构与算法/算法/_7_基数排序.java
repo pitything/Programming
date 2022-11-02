@@ -1,14 +1,28 @@
 package 算法;
 
+import java.util.Arrays;
+
 public class _7_基数排序 {
+
+    public static void main(String[] args) {
+        int[] nums = new int[]{-43 , 51 , 7 , 8, 1 , 2 , 3 , 6};
+        radixSort(nums);
+        System.out.println(Arrays.toString(nums));
+    }
     public static void radixSort(int[] arr) {
         //根据前面的推导过程，我们可以得到最终的基数排序代码
         // 1. 得到数组中最大的数的位数
         int max = arr[0];//假设第一数就是最大数
+        int min = arr[0];//假设第一数就是最大数
         for (int i = 1; i < arr.length; i++) {
-            if (arr[i] > max) {
-                max = arr[i];
+            max = Math.max(arr[i], max);
+            min = Math.min(arr[i], min);
+        }
+        if(min < 0){
+            for (int i = 0; i < arr.length; i++) {
+                arr[i] -= min;
             }
+            max -= min;
         }
         //得到最大数是几位数
         int maxLength = (max + "").length();
@@ -49,6 +63,12 @@ public class _7_基数排序 {
                 bucketElementCounts[k] = 0;
             }
 //            System.out.println("第"+(i+ 1 )+"轮，对个位的排序处理 arr="+Arrays.toString(arr));
+        }
+
+        if(min < 0){
+            for (int i = 0; i < arr.length; i++){
+                arr[i] += min;
+            }
         }
 
 /**

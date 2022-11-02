@@ -1,5 +1,9 @@
 # MySQL高级篇
 
+讲师：尚硅谷-宋红康（江湖人称：康师傅）
+
+官网： **[http://www.atguigu.com](http://www.atguigu.com)**
+
 ## Linux下MySQL的安装与使用
 
 ### 安装前说明
@@ -8,11 +12,27 @@
 
 > - 安装并启动好两台虚拟机： CentOS 7
 >   - 掌握克隆虚拟机的操作
->   - mac地
->   - 主机名
->   - ip地址
->   - UUID
+>   
+>   - 修改mac地址：
+>   
+>     ![image-20221031153942777](https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20221031153942777.png)
 >
+>   - hostname主机名，需要重启（reboot）
+>   
+>     ```shell
+>     vim /etc/hostname
+>     reboot
+>     ```
+>   
+>   - 修改ip地址、UUID：如果是动态分配ip则不用修改，要使用固定ip则修改
+>   
+>     ```shell
+>     vim /etc/sysconfig/network-scripts/ifcfg-eth0
+>     IPADDR="10.211.55.88"
+>     -- 重启网络
+>     systemctl restart network
+>     ```
+>   
 > - 安装有 Xshell 和 Xftp 等访问CentOS系统的工具
 >
 > - CentOS6和CentOS7在MySQL的使用中的区别
@@ -2966,7 +2986,7 @@ show status like 'slow_queries';
 
 - -s: 是表示按照何种方式排序：
 
-  c: 访问次数
+  k
 
   l: 锁定时间
 
@@ -5352,3 +5372,1767 @@ UPDATE user SET id=2 WHERE id=1;
 > undo log是逻辑日志，对事务回滚时，只是将数据库逻辑地恢复到原来的样子。
 >
 > redo log是物理日志，记录的是数据页的物理变化，undo log不是redo log的逆过程。
+
+## 锁
+
+> 事务的隔离性由这章讲述的锁来实现。
+
+### 概述
+
+> 在数据库中，除传统的计算资源（如CPU、RAM、I/O等）的争用以外，数据也是一种供许多用户共享的资源。为保证数据的一致性，需要对并发操作进行控制，因此产生了锁。同时锁机制也为实现MySQL的各个隔离级别提供了保证。锁冲突也是影响数据库并发访问性能的一个重要因素。所以锁对数据库而言显得尤其重要，也更加复杂。
+
+### MySQL并发事务访问相同记录
+
+#### 读-读情况
+
+> 读-读 情况，即并发事务相继 读取相同的记录 。读取操作本身不会对记录有任何影响，并不会引起什么问题，所以允许这种情况的发生。
+
+#### 写-写情况
+
+> 写-写 情况，即并发事务相继对相同的记录做出改动。
+>
+> 在这种情况下会发生` 脏写` 的问题，任何一种隔离级别都不允许这种问题的发生。所以在多个未提交事务相继对一条记录做改动时，需要让它们 排队执行 ，这个排队的过程其实是通过 `锁` 来实现的。这个所谓的锁其实是一个 内存中的结构 ，在事务执行前本来是没有锁的，也就是说一开始是没有 锁结构 和记录进行关联的，如图所示：
+>
+> <img src="https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20221026102559038.png" alt="image-20221026102559038" style="zoom:50%;" />
+>
+> 当一个事务想对这条记录做改动时，首先会看看内存中有没有与这条记录关联的 锁结构 ，当没有的时候就会在内存中生成一个 锁结构 与之关联。比如，事务 T1 要对这条记录做改动，就需要生成一个 锁结构与之关联：
+>
+> <img src="https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20221026102645485.png" alt="image-20221026102645485" style="zoom:50%;" />
+>
+> 当其他事务再次来修改这条数据时，也会生成一条锁结构，如果这条数据已经有锁结构，就进行等待
+>
+> <img src="https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20221026102929223.png" alt="image-20221026102929223" style="zoom:50%;" />
+>
+> 等到上一个事务commit之后，解除了锁，下一个事务才可以修改数据。
+>
+> <img src="https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20221026103137158.png" alt="image-20221026103137158" style="zoom:50%;" />
+>
+> 小结几种说法：
+>
+> 不加锁意思就是不需要在内存中生成对应的 锁结构 ，可以直接执行操作。
+>
+> 获取锁成功：意思就是在内存中生成了对应的 锁结构 ，而且锁结构的 is_waiting 属性为 false ，也就是事务可以继续执行操作。
+>
+> 获取锁失败或者没有获取到锁：意思就是在内存中生成了对应的 锁结构 ，不过锁结构的 is_waiting 属性为 true ，也就是事务 需要等待，不可以继续执行操作。
+
+#### 读-写或写-读情况
+
+> 读-写或写-读，即一个事务进行读取操作，另一个进行改动操作。这种情况下可能发生脏读、不可重复读、幻读的问题。各个数据库厂商对SQL标准的支持都可能不一样。比如MySQL在REPEATABLE READ隔离级别上，使用MVCC机制，就已经解决了幻读问题。
+
+#### 并发问题的解决方案
+
+##### 方案一
+
+> 读操作利用多版本并发控制（MVCC，下章讲解），写操作进行加锁。
+>
+> MVCC就是生成一个ReadView，通过ReadView找到符合条件的版本（利用undo日志）。读的时候，会生成一个ReadView，只会读到生成ReadView之前的`已提交的事务`修改后的数据，在ReadView生成之后，进行的修改是读取不到的。写的时候，通过加锁的方式，来更新最新的数据。
+>
+> 普通的SELECT语句在READ COMMITTED和REPEATABLE READ隔离级别下会使用到`MVCC读取记录`。
+>
+> - 在 READ COMMITTED 隔离级别下，一个事务在执行过程中`每次执行SELECT操作时都会生成一个ReadView`，ReadView的存在本身就保证了 事务不可以读取到未提交的事务所做的更改 ，也就是避免了脏读现象；
+>
+> - 在 REPEATABLE READ 隔离级别下，一个事务在执行过程中`只有 第一次执行SELECT操作 才会生成一个ReadView`，之后的SELECT操作都 复用 这个ReadView，这样也就避免了不可重复读和幻读的问题。
+
+##### 方案二
+
+> 读、写操作都采用加锁的方式。
+
+##### 小结
+
+> - 采用 MVCC 方式的话， 读-写 操作彼此并不冲突， 性能更高 。
+> - 采用 加锁 方式的话， 读-写 操作彼此需要 排队执行 ，影响性能。
+> - 一般情况下我们当然愿意采用 MVCC 来解决 读-写 操作并发执行的问题，但是业务在某些特殊情况下，要求必须采用 加锁 的方式执行。下面就讲解下MySQL中不同类别的锁。
+
+### 锁的不同角度分类
+
+<img src="https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20221026112235396.png" alt="image-20221026112235396" style="zoom:50%;" />
+
+
+#### 从数据操作的类型划分：读锁、写锁
+
+> - 读锁 ：也称为 `共享锁(shared lock)` 、英文用 `S` 表示。针对同一份数据，多个事务的读操作可以同时进行而不会互相影响，相互不阻塞的。
+>
+> - 写锁 ：也称为 `排他锁(exclusive lock)` 、英文用 `X` 表示。当前写操作没有完成前，它会阻断其他写锁和读锁。当数据已经有读锁或者写锁时，他会等待锁的释放。这样就能确保在给定的时间里，只有一个事务能执行写入，并防止其他用户读取正在写入的同一资源。
+>
+> **需要注意的是对于** **InnoDB** **引擎来说，读锁和写锁可以加在表上，也可以加在行上。**
+
+##### 锁定读
+
+> 对读取操作添加锁
+>
+> - 添加S锁，其他事务可以读取表中数据，但是不能添加X锁进行修改
+>
+>   ```sql
+>   -- mysql 8.0 之前
+>   select * from goods lock in share mode ;
+>   -- mysql 8.0 新增写法
+>   select * from goods for share ;
+>   ```
+>
+> - 添加X锁，其他事务 不可以读，也不可以修改
+>
+>   ```sql
+>   select * from goods for update ;
+>   ```
+
+
+#### 从数据操作的粒度划分：表级锁、页级锁、行锁
+
+##### 表锁（Table Lock）
+
+> 添加在表层面，是mysql最基本的锁策略，并不依赖存储引擎。表锁的开销最小，`不会造成死锁`的情况，但是并发量大打折扣。
+
+###### 表级别的S锁、X锁
+
+> 在对某个表执行SELECT、INSERT、DELETE、UPDATE语句时，InnoDB存储引擎是不会为这个表添加表级别的S锁或者X锁的。在对某个表执行一些诸如ALTER TABLE、DROP TABLE这类的DDL语句时，其他事务对这个表并发执行诸如SELECT、INSERT、DELETE、UPDATE的语句会发生阻塞。同理，某个事务中对某个表执行SELECT、INSERT、DELETE、UPDATE语句时，在其他会话中对这个表执行DDL语句也会发生阻塞。这个过程其实是通过在server层使用一种称之为`元数据锁（英文名：Metadata Locks，简称MDL）`结构来实现的。
+>
+> 一般情况下，`不会使用InnoDB存储引擎提供的表级别的S锁和X锁`，表级锁多使用在MyISAM存储引擎。只会在一些特殊情况下，比方说崩溃恢复过程中用到。比如，在系统变量autocommit=0，innodb_table_locks = 1时，手动获取表t 的S锁或者X锁可以这么写：
+>
+> ```sql
+> LOCK TABLES t READ：-- 会对表t加表级别的S锁。
+> LOCK TABLES t WRITE：-- 会对表t加表级别的X锁。
+> UNLOCK TABLES; -- 释放锁
+> 
+> show open tables; -- 获取所有表的是否锁定的状态，in_use：0:没有锁定，1:锁定
+> ```
+>
+> 不过尽量避免在使用InnoDB存储引擎的表上使用LOCK TABLES这样的手动锁表语句，它们并不会提供什么额外的保护，只是会降低并发能力而已。InnoDB的厉害之处还是实现了更细粒度的`行锁`，关于InnoDB表级别的S锁和X锁大家了解一下就可以了。
+>
+> <img src="https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20221026164801918.png" alt="image-20221026164801918" style="zoom:50%;" />
+
+######  意向锁 （intention lock） 
+
+> InnoDB 支持多粒度锁（multiple granularity locking），它`允许行级锁与表级锁共存`，而 **意向锁** 就是其中的一种`表锁`。
+>
+> - 意向锁的存在是为了`协调表级锁和行级锁的关系`，支持多粒度锁共存。
+> - 意向锁是一种不与行级锁发生冲突的表级锁
+> - 意向锁表示事务已经或者有意向对某些行持有锁
+>
+> 意向锁分为两种：
+>
+> - `意向共享锁` （intention shared lock, IS）：事务有意向对表中的某些行加 共享锁 （S锁）
+>
+>   ```sql
+>   -- 事务要获取某些行的 S 锁，必须先获得表的 IS 锁。
+>   SELECT column FROM table ... LOCK IN SHARE MODE;
+>   ```
+>
+> - `意向排他锁` （intention exclusive lock, IX）：事务有意向对表中的某些行加 排他锁 （X锁）
+>
+>   ```sql
+>   -- 事务要获取某些行的 X 锁，必须先获得表的 IX 锁。
+>   SELECT column FROM table ... FOR UPDATE;
+>   ```
+>
+> - 意向锁是由`存储引擎自己维护的`，用户无法手动操作意向锁，在为数据行加共享 / 排他锁之前，InooDB 会先获取该数据行所在数据表的对应意向锁。
+
+**意向锁解决的问题**
+
+> 如果一个事务，在表中某一行，添加了一个排他锁，其他事务想要对这个表添加排他锁，就不用一行行遍历是否已经存在排他锁，存储引擎会在更大一级的空间，比如数据页或者数据表级别自动添加一个意向排他锁，使得其他事务不能添加表级别的排他锁。
+
+**意向锁的兼容性**
+
+> - `意向锁之间`的兼容性
+>
+> <img src="https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20221027112241843.png" alt="image-20221027112241843" style="zoom:50%;" />
+>
+> - `意向锁和表级锁`的兼容性
+>
+>   <img src="https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20221027112443586.png" alt="image-20221027112443586" style="zoom:50%;" />
+>
+> - `意向锁和行级锁`的兼容性
+>
+>   意向锁和行级锁不会发生互斥
+
+###### 自增锁（AUTO-INC锁）
+
+> 在使用MySQL过程中，我们可以为表的某个列如id字段，添加AUTO_INCREMENT属性。AUTO-INC锁是向含有AUTO_INCREAMENT属性的表插入数据时添加的一个特殊的`表级锁`。插入数据时，可以不用说明id字段的值，mysql会自动添加。
+>
+> 添加方式分为3类：
+>
+> - `Simple inserts`（简单插入）：`可以预先确定要插入的行数`（当语句被初始处理时）的语句。包括没有嵌套子查询的单行和多行INSERT...VALUES()和REPLACE语句。比如我们上面举的例子就属于该类插入，已经确定要插入的行数。
+> - `Bulk inserts`（批量插入）：`事先不知道要插入的行数`（和所需自动递增值的数量）的语句。比如INSERT ... SELECT，REPLACE... SELECT和LOAD DATA语句，但不包括纯INSERT。 InnoDB在每处理一行，为AUTO_INCREMENT列分配一个新值。
+> - `Mixed-mode inserts`（混合模式插入）：这些是“Simple inserts”语句但是`指定部分新行的自动递增值`。例如 INSERT INTO teacher (id,name) VALUES (1,'a'), (NULL,'b'), (5,'c'), (NULL,'d'); 只是指定了部分id的值。另一种类型的“混合模式插入”是 INSERT ... ON DUPLICATE KEY UPDATE 。 
+>
+> 一个事务在持有auto_inc锁的时候，其他添加数据的事务会被阻塞，这样并发效率不高，mysql提供了`innodb_autoinc_lock_mode`参数来控制不同的锁定机制：
+>
+> - `innodb_autoinc_lock_mode = 0(“传统”锁定模式)`：在此锁定模式下，所有类型的insert语句都会获得一个特殊的表级AUTO-INC锁，用于插入具有AUTO_INCREMENT列的表。每当执行insert的时候，都会得到一个表级锁(AUTO-INC锁)，使得语句中生成的auto_increment为顺序，且在binlog中重放的时候，可以保证master与slave中数据的auto_increment是相同的。因为是表级锁，当在同一时间多个事务中执行insert的时候，对于AUTO-INC锁的争夺会限制并发能力。
+> - `innodb_autoinc_lock_mode = 1(“连续”锁定模式)`：在 `MySQL 8.0 之前，连续锁定模式是默认`的。在这个模式下，“bulk inserts”仍然使用AUTO-INC表级锁，并保持到语句结束。这适用于所有INSERT ...SELECT，REPLACE ... SELECT和LOAD DATA语句。同一时刻只有一个语句可以持有AUTO-INC锁。对于“Simple inserts”（要插入的行数事先已知），则通过在mutex（轻量锁）的控制下获得所需数量的自动递增值来避免表级AUTO-INC锁， 它只在分配过程的持续时间内保持，而不是直到语句完成。不使用表级AUTO-INC锁，除非AUTO-INC锁由另一个事务保持。如果另一个事务保持AUTO-INC锁，则“Simpleinserts”等待AUTO-INC锁，如同它是一个“bulk inserts”。
+> - `innodb_autoinc_lock_mode = 2(“交错”锁定模式)`：从 `MySQL 8.0 开始，交错锁模式是默认设置`。在此锁定模式下，自动递增值保证在所有并发执行的所有类型的insert语句中是`唯一且单调递增`的。但是，由于多个语句可以同时生成数字（即，跨语句交叉编号）， 为任何给定语句插入的行生成的值`可能不是连续的`。
+
+###### 元数据锁（MDL锁）
+
+> `MySQL5.5引入了meta data lock，简称MDL锁`，属于表锁范畴。MDL 的作用是，保证读写的正确性。比如，如果一个查询正在遍历一个表中的数据，而执行期间另一个线程对这个表结构做变更，增加了一列，那么查询线程拿到的结果跟表结构对不上，肯定是不行的。因此， **当对一个表做增删改查操作的时候，加 MDL读锁；当要对表做结构变更操作的时候，加 MDL 写锁。**
+
+##### InnoDB中的行锁
+
+> 行锁，也叫记录锁，就是锁住某一行。
+>
+> 优点：锁定粒度小，锁冲突概率低，并发度高
+>
+> 缺点：系统开销大，容易发生死锁。
+
+###### 记录锁（Record Locks）
+
+> 记录锁也就是仅仅把一条记录锁上，官方的类型名称为：`LOCK_REC_NOT_GAP`。比如我们把id值为 8 的那条记录加一个记录锁的示意图如图所示。仅仅是锁住了id值为 8 的记录，对周围的数据没有影响。
+>
+> <img src="https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20221027135021442.png" alt="image-20221027135021442" style="zoom:50%;" />
+>
+> 记录锁是有S锁和X锁之分的，称之为 `S型记录锁 和 X型记录锁` 。
+>
+> - 当一个事务获取了一条记录的`S型记录锁`后，其他事务也`可以`继续获取该记录的S型记录锁，但`不可以`继续获取X型记录锁；
+>
+>   ```sql
+>   select * from student where id = 8 lock in share mode ;
+>   ```
+>
+> - 当一个事务获取了一条记录的`X型记录锁`后，其他事务既`不可以`继续获取该记录的S型记录锁，也`不可以`继续获取X型记录锁。
+>
+>   ```sql
+>   select * from student where id = 8 for update ;
+>   ```
+
+###### 间隙锁（Gap Locks）
+
+> MySQL在`REPEATABLE READ`隔离级别下是可以解决`幻读`问题的，解决方案有两种，可以使用`MVCC方案`解决，也可以采用`加锁方案`解决。但是在使用加锁方案解决时有个大问题，就是事务在第一次执行读取操作时，那些幻影记录尚不存在，我们无法给这些幻影记录加上记录锁。InnoDB提出了一种称之为`Gap Locks`的锁，官方的类型名称为：`LOCK_GAP`，我们可以简称为gap锁。比如，把id值为 8 的那条记录加一个gap锁的示意图如下。(3, 8 )这个区间都不允许加入数据，直到拥有这个gap锁的事务commit或者rollback。
+>
+> **gap锁是REPEATABLE READ下的一种锁，为了防止插入幻影记录而提出的，间隙锁不分共享锁和排他锁，在READ-COMMITTED隔离级别下，使用MVCC解决了幻读问题** 。
+>
+> <img src="https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20221027142041472.png" alt="image-20221027142041472" style="zoom:50%;" />
+>
+> 间隙锁很容易造成死锁的情况，如之前业务上遇到多线程根据组合树节点先删除，后插入的问题。如果删除条件where 中有不在数据库内的节点id，那么delete就会生成一个gap锁，锁住该节点前后区间，导致其他事务进入阻塞，如果其他事务也存在删除数据库内没有的节点情况，就会导致死锁的发生。
+>
+> `gap锁不区分S锁和X锁`，如下sql都可以锁住(3, 8)
+>
+> ```sql
+> select * from student where id = 7 lock in share mode ;
+> select * from student where id = 7 for update ;
+> ```
+
+###### 临键锁（Next-Key Locks）
+
+> 有时候我们既想锁住某条记录，又想阻止其他事务在该记录前边的间隙插入新记录，所以InnoDB就提出了一种称之为`Next-Key Locks`的锁，官方的类型名称为：`LOCK_ORDINARY`，我们也可以简称为next-key锁。Next-Key Locks是在存储引擎innodb、事务级别在`可重复读的`情况下使用的数据库锁，`innodb默认的锁就是Next-Key locks`。临键锁就是 记录锁 + gap锁
+>
+> 如下sql锁住了(3, 8]
+>
+> ```sql
+> select * from student where id <= 8 and id > 3 lock in share mode;
+> select * from student where id <= 8 and id > 3 for update ;
+> ```
+
+###### 插入意向锁（Insert Intention Locks）
+
+> 我们说一个事务在插入一条记录时需要判断一下插入位置是不是被别的事务加了gap锁（next-key锁也包含gap锁），如果有的话，插入操作需要等待，直到拥有gap锁的那个事务提交。但是 **InnoDB规定事务在等待的时候也需要在内存中生成一个锁结构** ，表明有事务想在某个间隙中插入新记录，但是现在在等待。InnoDB就把这种类型的锁命名为`Insert Intention Locks`，官方的类型名称为：`LOCK_INSERT_INTENTION`，我们称为`插入意向锁`。插入意向锁是一种Gap锁，不是意向锁，在insert操作时产生。
+>
+> 插入意向锁是在插入一条记录行前，由 INSERT 操作产生的一种间隙锁，`插入意向锁互相不排斥`。事实上 **插入意向锁并不会阻止别的事务继续获取该记录上任何类型的锁。**
+
+##### 页锁
+
+> 页锁就是在 `页的粒度` 上进行锁定，锁定的数据资源比行锁要多，因为一个页中可以有多个行记录。当我们使用页锁的时候，会出现数据浪费的现象，但这样的浪费最多也就是一个页上的数据行。**页锁的开销介于表锁和行锁之间，会出现死锁。锁定粒度介于表锁和行锁之间，并发度一般。**
+>
+> 每个层级的锁数量是有限制的，因为锁会占用内存空间， `锁空间的大小是有限的` 。当某个层级的锁数量超过了这个层级的阈值时，就会进行 `锁升级` 。锁升级就是用更大粒度的锁替代多个更小粒度的锁，比如InnoDB 中行锁升级为表锁，这样做的好处是占用的锁空间降低了，但同时数据的并发度也下降了。
+
+#### 从对待锁的态度划分:乐观锁、悲观锁
+
+> 从对待锁的态度来看锁的话，可以将锁分成乐观锁和悲观锁，从名字中也可以看出这两种锁是两种看待数据并发的思维方式。需要注意的是，乐观锁和悲观锁并不是锁，而是锁的设计思想。
+
+##### 悲观锁（Pessimistic Locking）
+
+> 悲观锁是一种思想，顾名思义，就是很悲观，对数据被其他事务的修改持保守态度，会通过`数据库自身的锁机制`来实现，从而保证数据操作的排它性。
+>
+> 悲观锁总是假设最坏的情况，每次去拿数据的时候都认为别人会修改，所以`每次在拿数据的时候都会上锁`，这样别人想拿这个数据就会 阻塞 直到它拿到锁（**共享资源每次只给一个线程使用，其它线程阻塞，用完后再把资源转让给其它线程**）。比如行锁，表锁等，读锁，写锁等，都是在做操作之前先上锁，当其他线程想要访问数据时，都需要阻塞挂起。Java中 synchronized 和 ReentrantLock 等独占锁就是悲观锁思想的实现。
+>
+> `select ... from xxx for update`就是悲观锁。它会把执行过程中扫描的所有数据都加上锁，因此使用悲观锁必须确定使用索引，要不然全表扫描，会将整个表的数据都给锁上。
+
+##### 乐观锁（Optimistic Locking）
+
+> 乐观锁认为对同一数据的并发操作不会总发生，属于小概率事件，`不用每次都对数据上锁`，但是在更新的时候会判断一下在此期间别人有没有去更新这个数据，也就是**不采用数据库自身的锁机制，而是通过程序来实现**。在程序上，我们可以采用 `版本号机制 或者 CAS机制` 实现。**乐观锁适用于多读的应用类型，这样可以提高吞吐量**。在Java中 java.util.concurrent.atomic 包下的原子变量类就是使用了乐观锁的一种实现方式：CAS实现的。
+
+###### 乐观锁的版本号机制
+
+> 在表中设计一个版本字段 version，第一次读的时候，会获取 version 字段的取值。然后对数据进行更新或删除操作时，会执行UPDATE ... SET version=version+1 WHERE version=version。此时如果已经有事务对这条数据进行了更改，修改就不会成功。
+
+###### 乐观锁的时间戳机制
+
+> 时间戳和版本号机制一样，也是在更新提交的时候，将当前数据的时间戳和更新之前取得的时间戳进行比较，如果两者一致则更新成功，否则就是版本冲突。
+>
+> 你能看到乐观锁就是程序员自己控制数据并发操作的权限，基本是通过给数据行增加一个戳（版本号或者时间戳），从而证明当前拿到的数据是否最新。
+
+##### 两种锁的适用场景
+
+> 从这两种锁的设计思想中，我们总结一下乐观锁和悲观锁的适用场景：
+>
+> 1. `乐观锁 适合 读操作多` 的场景，相对来说写的操作比较少。它的优点在于 程序实现 ， 不存在死锁问题，不过适用场景也会相对乐观，因为它阻止不了除了程序以外的数据库操作。
+>
+> 2. `悲观锁 适合 写操作多` 的场景，因为写的操作具有 排它性 。采用悲观锁的方式，可以在数据库层面阻止其他事务对该数据的操作权限，防止 读 - 写 和 写 - 写 的冲突。
+
+#### 按加锁的方式划分：显式锁、隐式锁
+
+##### 隐式锁
+
+> **情景一：**对于`聚簇索引`记录来说，有一个 `trx_id` 隐藏列，该隐藏列记录着最后改动该记录的 `事务 id` 。那么如果在当前事务中新`插入`一条聚簇索引记录后，该记录的 trx_id 隐藏列代表的的就是当前事务的 事务id ，如果其他事务此时想对该记录添加 S锁 或者 X锁 时，首先会看一下该记录的trx_id 隐藏列代表的事务是否是当前的活跃事务，如果是的话，那么就帮助当前事务创建一个 X锁 （也就是为当前事务创建一个锁结构， is_waiting 属性是 false ），然后自己进入等待状态（也就是为自己也创建一个锁结构， is_waiting 属性是 true ）。
+>
+> **情景二：**对于`二级索引`记录来说，本身并`没有 trx_id 隐藏列`，但是在二级索引页面的 `Page Header` 部分有一个 `PAGE_MAX_TRX_ID` 属性，该属性代表对该页面做改动的最大的 事务id ，如果 PAGE_MAX_TRX_ID 属性值小于当前最小的活跃 事务id ，那么说明对该页面做修改的事务都已经提交了，否则就需要在页面中定位到对应的二级索引记录，然后回表找到它对应的聚簇索引记录，然后再重复 情景一 的做法。
+>
+> 隐式锁的逻辑过程如下：
+>
+> A. InnoDB的每条记录中都一个隐含的trx_id字段，这个字段存在于聚簇索引的B+Tree中。
+>
+> B. 在操作一条记录前，首先根据记录中的trx_id检查该事务是否是活动的事务(未提交或回滚)。如果是活动的事务，首先将 隐式锁 转换为 显式锁 (就是为该事务添加一个锁)。 
+>
+> C. 检查是否有锁冲突，如果有冲突，创建锁，并设置为waiting状态。如果没有冲突不加锁，跳到E。 
+>
+> D. 等待加锁成功，被唤醒，或者超时。
+>
+> E. 写数据，并将自己的trx_id写入trx_id字段。
+
+##### 显式锁
+
+> 通过特定的语句进行加锁，我们一般称之为显示加锁，例如：
+>
+> - 显示加共享锁：select .... lock in share mode
+>
+> - 显示加排它锁：select .... for update
+> - 查找所有显示锁：select * from performance_schema.data_lock_waits \G;
+
+#### 其它锁之：全局锁
+
+> 全局锁就是对 `整个数据库实例` 加锁。当你需要让`整个库处于 只读状态` 的时候，可以使用这个命令，之后其他线程的以下语句会被阻塞：数据更新语句（数据的增删改）、数据定义语句（包括建表、修改表结构等）和更新类事务的提交语句。全局锁的典型使用 场景 是：做 `全库逻辑备份` 。
+>
+> ```sql
+> Flush tables with read lock
+> ```
+
+#### 其它锁之：死锁
+
+> 死锁就是多个事务持有对方需要的锁，并且都在等待对方释放，但是都不会释放自己的锁。
+>
+> 产生死锁的必要条件：
+>
+> - 两个和两个以上的事务
+> - 每个事务都持有锁，并且申请锁
+>
+> 产生死锁的必要条件：
+> （1）互斥条件：进程要求对所分配的资源进行排它性控制，即在一段时间内某资源仅为一进程所占用。
+> （2）请求和保持条件：当进程因请求资源而阻塞时，对已获得的资源保持不放。
+> （3）不剥夺条件：进程已获得的资源在未使用完之前，不能剥夺，只能在使用完时由自己释放。
+> （4）环路等待条件：在发生死锁时，必然存在一个进程–资源的环形链。
+>
+> 预防死锁：
+> （1）资源一次性分配：一次性分配所有资源，这样就不会再有请求了：（破坏请求条件）
+> （2）只要有一个资源得不到分配，也不给这个进程分配其他的资源：（破坏请保持条件）
+> （3）可剥夺资源：即当某进程获得了部分资源，但得不到其它资源，则释放已占有的资源（破坏不可剥夺条件）
+> （4）资源有序分配法：系统给每类资源赋予一个编号，每一个进程按编号递增的顺序请求资源，释放则相反（破坏环路等待条件）
+>
+> 当出现死锁以后，有两种策略：
+>
+> - 一种策略是，直接进入`等待，直到超时`。这个超时时间可以通过参数`innodb_lock_wait_timeout`来设置。不可改的太小，否则会危害到其他正常的等待事务。
+> - 另一种策略是，发起`死锁检测`，发现死锁后，主动回滚死锁链条中的某一个事务（`将持有最少行级排他锁的事务进行回滚`），让其他事务得以继续执行。将参数`innodb_deadlock_detect设置为on`，表示开启这个逻辑。
+
+### 锁的内存结构
+
+> InnoDB存储引擎中的锁结构如下：
+
+<img src="https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20221027191203586.png" alt="image-20221027191203586" style="zoom:50%;" />
+
+##### 结构解析
+
+> 1. `锁所在的事务信息` ：不论是 表锁 还是 行锁 ，都是在事务执行过程中生成的，哪个事务生成了这个 锁结构 ，这里就记录这个事务的信息。此 锁所在的事务信息 在内存结构中只是一个指针，通过指针可以找到内存中关于该事务的更多信息，比方说事务id等。
+>
+> 2. `索引信息` ：对于 行锁 来说，需要记录一下加锁的记录是属于哪个索引的。这里也是一个指针。
+>
+> 3. `表锁／行锁信息` ： 
+>
+>    - 表锁：记载着是对哪个表加的锁，还有其他的一些信息。
+>    - 行锁：记载了三个重要的信息：
+>      - Space ID ：记录所在表空间。
+>      - Page Number ：记录所在页号。
+>      - n_bits ：对于行锁来说，一条记录就对应着一个比特位，一个页面中包含很多记录，用不同的比特位来区分到底是哪一条记录加了锁。为此在行锁结构的末尾放置了一堆比特位，这个n_bits 属性代表使用了多少比特位。n_bits的值一般都比页面中记录条数多一些。主要是为了之后在页面中插入了新记录后也不至于重新分配锁结构
+>
+> 4. type_mode ：这是一个32位的数，被分成了 lock_mode 、 lock_type 和 rec_lock_type 三个部分，如图所示：
+>
+>    <img src="https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20221027191736566.png" alt="image-20221027191736566" style="zoom:50%;" />
+>
+>    - 锁的模式（ lock_mode ），占用低4位，可选的值如下：
+>
+>      LOCK_IS （十进制的 0 ）：表示共享意向锁，也就是 IS锁 。 
+>
+>      LOCK_IX （十进制的 1 ）：表示独占意向锁，也就是 IX锁 。 
+>
+>      LOCK_S （十进制的 2 ）：表示共享锁，也就是 S锁 。 
+>
+>      LOCK_X （十进制的 3 ）：表示独占锁，也就是 X锁 。 
+>
+>      LOCK_AUTO_INC （十进制的 4 ）：表示 AUTO-INC锁 。 
+>
+>      在InnoDB存储引擎中，LOCK_IS，LOCK_IX，LOCK_AUTO_INC都算是表级锁的模式，LOCK_S和 LOCK_X既可以算是表级锁的模式，也可以是行级锁的模式。
+>
+>    - 锁的类型（ lock_type ），占用第5～8位，不过现阶段只有第5位和第6位被使用：
+>
+>      LOCK_TABLE （十进制的 16 ），也就是当第5个比特位置为1时，表示表级锁。
+>
+>      LOCK_REC （十进制的 32 ），也就是当第6个比特位置为1时，表示行级锁。
+>
+>    - 行锁的具体类型（ rec_lock_type ），使用其余的位来表示。只有在 lock_type 的值为
+>
+>      LOCK_REC 时，也就是只有在该锁为行级锁时，才会被细分为更多的类型：
+>
+>      LOCK_ORDINARY （十进制的 0 ）：表示 next-key锁 。 
+>
+>      LOCK_GAP （十进制的 512 ）：也就是当第10个比特位置为1时，表示 gap锁 。 
+>
+>      LOCK_REC_NOT_GAP （十进制的 1024 ）：也就是当第11个比特位置为1时，表示正经 记录 锁 。
+>
+>      LOCK_INSERT_INTENTION （十进制的 2048 ）：也就是当第12个比特位置为1时，表示插入意向锁。其他的类型：还有一些不常用的类型我们就不多说了。
+>
+>    - is_waiting 属性呢？基于内存空间的节省，所以把 is_waiting 属性放到了 type_mode 这个32位的数字中：
+>      
+>      - LOCK_WAIT （十进制的 256 ） ：当第9个比特位置为 1 时，表示 is_waiting 为 true ，也就是当前事务尚未获取到锁，处在等待状态；当这个比特位为 0 时，表示 is_waiting 为 false ，也就是当前事务获取锁成功。
+>
+> 5. 其他信息 ：为了更好的管理系统运行过程中生成的各种锁结构而设计了各种哈希表和链表。
+>
+> 6. 一堆比特位 ：如果是 行锁结构 的话，在该结构末尾还放置了一堆比特位，比特位的数量是由上边提到的 n_bits 属性表示的。InnoDB数据页中的每条记录在 记录头信息 中都包含一个 heap_no 属性，伪记录 Infimum 的 heap_no 值为 0 ， Supremum 的 heap_no 值为 1 ，之后每插入一条记录， heap_no 值就增1。 锁结 构 最后的一堆比特位就对应着一个页面中的记录，一个比特位映射一个 heap_no ，即一个比特位映射到页内的一条记录。
+
+
+### 锁监控
+
+> 关于MySQL锁的监控，我们一般可以通过检查InnoDB_row_lock等状态变量来分析系统上的行锁的争夺情况
+
+```sql
+show status like '%innodb_row_lock%';
+```
+
+> Innodb_row_lock_current_waits：当前正在等待锁定的数量；
+>
+> `Innodb_row_lock_time` ：从系统启动到现在锁定总时间长度；（等待总时长）
+>
+> `Innodb_row_lock_time_avg` ：每次等待所花平均时间；（等待平均时长）
+>
+> Innodb_row_lock_time_max：从系统启动到现在等待最常的一次所花的时间；
+>
+> `Innodb_row_lock_waits` ：系统启动后到现在总共等待的次数；（等待总次数）
+
+**其他监控方法：**
+
+MySQL把事务和锁的信息记录在了`information_schema`库中，涉及到的三张表分别是`INNODB_TRX、INNODB_LOCKS和INNODB_LOCK_WAITS`。
+
+MySQL5.7及之前，可以通过information_schema.INNODB_LOCKS查看事务的锁情况，但只能看到阻塞事务的锁；如果事务并未被阻塞，则在该表中看不到该事务的锁情况。
+
+MySQL8.0删除了information_schema.INNODB_LOCKS，添加了performance_schema.data_locks，可以通过performance_schema.data_locks查看事务的锁情况，和MySQL5.7及之前不同，`performance_schema.data_locks`不但可以看到阻塞该事务的锁，还可以看到该事务所持有的锁。同时，information_schema.INNODB_LOCK_WAITS也被`performance_schema.data_lock_waits`所代替。
+
+- 查询正在被锁阻塞的sql语句。
+
+  ```sql
+  SELECT * FROM information_schema.INNODB_TRX\G;
+  ```
+
+- 查询锁等待情况
+
+  ```sql
+  SELECT * FROM performance_schema. data_lock_waits\G;
+  ```
+
+- 查询锁的情况
+
+  ```sql
+   SELECT * from performance_schema.data_locks\G
+  ```
+
+## 多版本并发控制(MVCC)
+
+### 什么是MVCC
+
+> MVCC （Multiversion Concurrency Control），`多版本并发控制`。顾名思义，MVCC 是通过数据行的多个版本管理来实现数据库的并发控制。这项技术使得在InnoDB的事务隔离级别下执行`一致性读`操作有了保证。换言之，就是为了查询一些正在被另一个事务更新的行，并且可以看到它们被更新之前的值，这样在做查询的时候就不用等待另一个事务释放锁。
+>
+> 在MySQL中，只有innodb支持MVCC机制，其他存储引擎不支持。
+
+### 快照读与当前读
+
+> MVCC在MySQL InnoDB中的实现主要是为了提高数据库并发性能，用更好的方式去处理`读-写冲突`，做到即使有读写冲突时，也能做到不加锁，非阻塞并发读，而这个读指的就是`快照读`, 而非当前读。当前读实际上是一种加锁的操作，是悲观锁的实现。而MVCC本质是采用乐观锁思想的一种方式。
+
+#### 快照读
+
+> 快照读又叫`一致性读`，读取的是快照数据。**不加锁的简单的** **SELECT** **都属于快照读**，即不加锁的非阻塞读；比如这样：
+>
+> ```sql
+> select * from XXX
+> ```
+>
+> 之所以出现快照读的情况，是基于提高并发性能的考虑，快照读的实现是基于MVCC，它在很多情况下，避免了加锁操作，降低了开销。
+>
+> 既然是基于多版本，那么快照读可能读到的并不一定是数据的最新版本，而有可能是之前的历史版本。
+>
+> 快照读的前提是隔离级别不是串行级别，`串行级别下的快照读会退化成当前读`。
+
+#### 当前读
+
+> 当前读读取的是记录的`最新版本`（最新数据，而不是历史版本的数据），读取时还要保证其他并发事务不能修改当前记录，会对读取的记录进行加锁。加锁的 SELECT，或者对数据进行增删改都会进行当前读。比如：
+
+```sql
+SELECT * FROM student LOCK IN SHARE MODE; -- 共享锁 
+SELECT * FROM student FOR UPDATE; -- 排他锁 
+INSERT INTO student values ... -- 排他锁 
+DELETE FROM student WHERE ... -- 排他锁 
+UPDATE student SET ... -- 排他锁
+```
+
+### 复习
+
+#### 再谈隔离级别
+
+> 我们知道事务有 4 个隔离级别，可能存在三种并发问题：
+
+<img src="https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20221028140246292.png" alt="image-20221028140246292" style="zoom:50%;" />
+
+> 在Mysql中可重复读，通过MVCC解决了幻读的问题
+
+<img src="https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20221028140437714.png" alt="image-20221028140437714" style="zoom:50%;" />
+
+#### 隐藏字段、Undo Log版本链
+
+> 回顾一下undo日志的版本链，对于使用InnoDB存储引擎的表来说，它的聚簇索引记录中都包含两个必要的隐藏列。
+>
+> - `trx_id`：每次一个事务对某条聚簇索引记录进行改动时，都会把该事务的事务id赋值给trx_id隐藏列。
+> - `roll_pointer`：每次对某条聚簇索引记录进行改动时，都会把旧的版本写入到undo日志中，然后这个隐藏列就相当于一个指针，可以通过它来找到该记录修改前的信息。
+>
+> `insert undo只在事务回滚时起作用`，当事务提交后，该类型的undo日志就没用了，它占用的UndoLog Segment也会被系统回收（也就是该undo日志占用的Undo页面链表要么被重用，要么被释放）。
+
+> 假设之后两个事务id分别为 10 、 20 的事务对这条记录进行 UPDATE 操作，操作流程如下：
+>
+> <img src="https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20221028142156960.png" alt="image-20221028142156960" style="zoom:50%;" />
+>
+> 每次对记录进行改动，都会记录一条undo日志，每条undo日志也都有一个 roll_pointer 属性（ INSERT 操作对应的undo日志没有该属性，因为该记录并没有更早的版本），可以将这些 undo日志都连起来，串成一个链表：
+>
+> <img src="https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20221028142429622.png" alt="image-20221028142429622" style="zoom:50%;" />
+>
+> 对该记录每次更新后，都会将旧值放到一条 undo日志 中，就算是该记录的一个旧版本，随着更新次数的增多，所有的版本都会被 roll_pointer 属性连接成一个链表，我们把这个链表称之为 `版本链` ，版本链的头节点就是当前记录最新的值。每个版本中还包含生成该版本时对应的 事务id 。 
+
+### MVCC实现原理之ReadView
+
+> MVCC 的实现依赖于： `隐藏字段、Undo Log、Read View` 。
+
+#### 什么是ReadView
+
+> ReadView就是一个事务在使用MVCC快照读时产生的`读视图`。事务启动时，会生成当前数据库系统的一个快照，innodb为每个事务建立了一个数组，`用于存放并维护当前活跃事务的id`（活跃事务：启动了且没有提交的事务。）
+
+#### 设计思路
+
+> 使用 `READ UNCOMMITTED` 隔离级别的事务，由于可以读到未提交事务修改过的记录，所以直接读取记录的最新版本就好了。
+>
+> 使用 `SERIALIZABLE` 隔离级别的事务，InnoDB规定使用加锁的方式来访问记录。
+>
+> 使用 `READ COMMITTED 和 REPEATABLE READ` 隔离级别的事务，都必须保证读到 已经提交了的 事务修改过的记录。假如另一个事务已经修改了记录但是尚未提交，是不能直接读取最新版本的记录的，核心问题就是需要判断一下版本链中的哪个版本是当前事务可见的，这是`ReadView要解决的主要问题`。
+>
+> 这个ReadView中主要包含4个比较重要的内容，分别如下：
+>
+> 1. `creator_trx_id` ，创建这个 Read View 的事务 ID。
+>
+>    说明：只有在对表中的记录做改动时（执行INSERT、DELETE、UPDATE这些语句时）才会为事务分配事务id，否则在一个`只读事务中的事务id值都默认为0。` 
+>
+> 2. `trx_ids` ，表示在生成ReadView时当前系统中活跃的读写事务的 事务id列表 。 
+>
+> 3. `up_limit_id` ，活跃的事务中最小的事务 ID。 
+>
+> 4. `low_limit_id` ，表示生成ReadView时系统中应该分配给下一个事务的 id 值。low_limit_id 是系统最大的事务id值，这里要注意是系统中的事务id，需要区别于正在活跃的事务ID。
+>
+>    注意：low_limit_id并不是trx_ids中的最大值，事务id是递增分配的。比如，现在有id为1， 2，3这三个事务，之后id为3的事务提交了。那么一个新的读事务在生成ReadView时，trx_ids就包括1和2，up
+
+#### ReadView的规则
+
+> 有了这个ReadView，这样在访问某条记录时，只需要按照下边的步骤判断记录的某个版本是否可见。
+>
+> - 如果被访问版本的trx_id属性值`与ReadView中的 creator_trx_id 值相同`，意味着当前事务在访问它自己修改过的记录，所以该版本可以被当前事务访问。
+>
+> - 如果被访问版本的trx_id属性值`小于ReadView中的 up_limit_id 值`，表明生成该版本的事务在当前事务生成ReadView前已经提交，所以该版本可以被当前事务访问。
+>
+> - 如果被访问版本的trx_id属性值`大于或等于ReadView中的 low_limit_id 值`，表明生成该版本的事务在当前事务生成ReadView后才开启，所以该版本不可以被当前事务访问。
+>
+> - 如果被访问版本的trx_id属性值`在ReadView的 up_limit_id 和 low_limit_id 之间`，那就需要判断一下trx_id属性值是不是在 trx_ids 列表中。
+>   - 如果在，说明创建ReadView时生成该版本的事务还是活跃的，该版本不可以被访问。
+>   - 如果不在，说明创建ReadView时生成该版本的事务已经被提交，该版本可以被访问
+
+#### MVCC整体操作流程
+
+> 了解了这些概念之后，我们来看下当查询一条记录的时候，系统如何通过MVCC找到它：
+>
+> 1. 首先获取事务自己的版本号，也就是事务 ID； 
+>
+> 2. 获取 ReadView； 
+>
+> 3. 查询得到的数据，然后与 ReadView 中的事务版本号进行比较；
+>
+> 4. 如果不符合 ReadView 规则，就需要从 Undo Log 中获取历史快照；
+>
+> 5. 最后返回符合规则的数据。
+
+- 在隔离级别为`读已提交`（Read Committed）时，一个事务中的`每一次 SELECT 查询都会重新获取一次Read View`。注意，此时同样的查询语句都会重新获取一次 Read View，这时如果 Read View 不同，就可能产生不可重复读或者幻读的情况。
+
+  ![image-20221028160437169](https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20221028160437169.png)
+
+- 当隔离级别为`可重复读`的时候，就避免了不可重复读，这是因为一个事务只在`第一次 SELECT 的时候会获取一次 Read View`，而后面所有的 SELECT 都会复用这个 Read View，如下表所示
+
+  ![image-20221028160425086](https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20221028160425086.png)
+
+## 其他数据库日志
+
+### MySQL支持的日志
+
+#### 日志类型
+
+> MySQL有不同类型的日志文件，用来存储不同类型的日志，分为 `二进制日志 、 错误日志 、 通用查询日志 和 慢查询日志` ，这也是常用的4种。`MySQL 8`又新增两种支持的日志： `中继日志 和 数据定义语句日志` 。使用这些日志文件，可以查看MySQL内部发生的事情。
+>
+> - **慢查询日志：**记录所有执行时间超过long_query_time的所有查询，方便我们对查询进行优化。
+>
+> - **通用查询日志：**记录所有连接的起始时间和终止时间，以及连接发送给数据库服务器的所有指令，对我们复原操作的实际场景、发现问题，甚至是对数据库操作的审计都有很大的帮助。
+>
+> - **错误日志：**记录MySQL服务的启动、运行或停止MySQL服务时出现的问题，方便我们了解服务器的状态，从而对服务器进行维护。
+>
+> - **二进制日志：**记录所有更改数据的语句，可以用于主从服务器之间的数据同步，以及服务器遇到故障时数据的无损失恢复。
+>
+> - **中继日志：**用于主从服务器架构中，从服务器用来存放主服务器二进制日志内容的一个中间文件。从服务器通过读取中继日志的内容，来同步主服务器上的操作。
+>
+> - **数据定义语句日志：**记录数据定义语句执行的元数据操作。
+>
+> 除二进制日志外，其他日志都是 文本文件 。默认情况下，所有日志创建于 MySQL数据目录 中。
+
+#### 日志的弊端
+
+> 日志功能会 降低MySQL数据库的性能 。
+>
+> 日志会 占用大量的磁盘空间 。
+
+### 慢查询日志(slow query log)
+
+> 前面章节《第09章_性能分析工具的使用》已经详细讲述。
+
+### 通用查询日志(general query log)
+
+> 通用查询日志用来 `记录用户的所有操作` ，包括启动和关闭MySQL服务、所有用户的连接开始时间和截止时间、发给 MySQL 数据库服务器的所有 SQL 指令等。当我们的数据发生异常时，**查看通用查询日志，还原操作时的具体场景**，可以帮助我们准确定位问题。通用日志`默认关闭`状态
+
+#### 查看当前状态
+
+<img src="https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20221030102757096.png" alt="image-20221030102757096" style="zoom:50%;" />
+
+#### 启动/停止日志
+
+##### 方式 1 ：永久性方式
+
+> 修改my.cnf或者my.ini配置文件来设置。在[mysqld]组下加入log选项，并重启MySQL服务。如果不指定目录和文件名，通用查询日志将默认存储在MySQL数据目录中的`hostname.log`文件中，hostname表示主机名。格式如下：
+>
+> ```sql
+> [mysqld] 
+> general_log=ON 
+> general_log_file=[path[filename]] #日志文件所在目录路径，filename为日志文件名
+> ```
+
+##### 方式 2 ：临时性方式
+
+```sql
+SET GLOBAL general_log=on; # 开启通用查询日志 
+SET GLOBAL general_log_file=’path/filename’; # 设置日志文件保存位置
+```
+
+#### 查看日志
+
+> 通用查询日志是以文本文件的形式存储在文件系统中的，可以使用文本编辑器直接打开日志文件。
+
+#### 删除\刷新日志
+
+```sql
+删除日志可以直接删除log文件
+-- 刷新日志
+mysqladmin -uroot -p flush-logs
+```
+
+### 错误日志(error log)
+
+#### 启动日志
+
+> 在MySQL数据库中，错误日志功能是 `默认开启` 的。而且，错误日志 `无法被禁止` 。默认情况下，错误日志存储在MySQL数据库的数据文件夹下，名称默认为 `mysqld.log` （Linux系统）或hostname.err （mac系统）。如果需要制定文件名，则需要在`my.cnf或者my.ini`中做如下配置：
+>
+> ```sql
+> [mysqld] 
+> log-error=[path/[filename]] #path为日志文件所在的目录路径，filename为日志文件名
+> ```
+
+#### 查看日志
+
+> MySQL错误日志是以文本文件形式存储的，可以使用文本编辑器直接查看。
+>
+> <img src="https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20221030105856720.png" alt="image-20221030105856720" style="zoom:50%;" />
+
+#### 删除\刷新日志
+
+> 删除：直接删除日志文件
+>
+> 刷新：
+>
+> ```sql
+>  mysqladmin -uroot -p flush-logs
+> -- 如果报错：不能打开文件，则执行下面命令，重新生成文件
+>  install -omysql -gmysql -m0644 /dev/null /var/log/mysqld.log
+> ```
+
+### 二进制日志(bin log)
+
+> binlog可以说是MySQL中比较 重要 的日志了，在日常开发及运维过程中，经常会遇到。binlog即binary log，二进制日志文件，也叫作变更日志（update log）。它记录了数据库所有执行的`DDL 和 DML` 等数据库更新事件的语句，但是不包含没有修改任何数据的语句（如数据查询语句select、 show等）。
+>
+> binlog主要应用场景：
+>
+> - 一是用于 `数据恢复`
+>
+> - 二是用于 `数据复制` 
+
+#### 查看默认情况
+
+> 查看记录二进制日志是否开启：在MySQL8中默认情况下，二进制文件是开启的。
+>
+> - log_bin：binglog日志是否开启
+> - log_bin_basename：binlog日志的基本文件名，后面会增加编号来标记每个文件
+> - log_bin_index：binlog索引文件
+> - log_bin_trust_function_creators：是否支持函数，默认关闭，防止now()这种函数导致数据不一致
+> - sql_log_bin：是否支持变更数据的sql记录到binlog中
+
+<img src="https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20221030141058926.png" alt="image-20221030141058926" style="zoom:50%;" />
+
+#### 日志参数设置
+
+##### 方式 1 ：永久性方式
+
+> 修改MySQL的my.cnf或my.ini文件可以设置二进制日志的相关参数，修改完重启mysql服务，每次重启服务都会重新生成一个binlog文件：
+>
+> ```shell
+> [mysqld] 
+> #启用二进制日志，binlog的基本文件名
+> log-bin=atguigu-bin 
+> # 保存时间，单位：秒（s）
+> binlog_expire_logs_seconds=600 
+> # 每个binlog的大小，默认1GB
+> max_binlog_size=100M
+> ```
+
+> **设置带文件夹的bin-log日志存放目录**
+>
+> 如果想改变日志文件的目录和名称，可以对my.cnf或my.ini中的log_bin参数修改如下：
+>
+> ```shell
+> [mysqld] 
+> log-bin="/var/lib/mysql/binlog/atguigu-bin"
+> ```
+>
+> 注意：新建的文件夹需要使用mysql用户，使用下面的命令即可。
+>
+> ```shell
+> chown -R -v mysql:mysql binlog
+> ```
+>
+> 注意：数据库文件最好不要和日志文件放在同一个磁盘上，防止一起丢失。
+
+##### 方式 2 ：临时性方式
+
+> 如果不希望通过修改配置文件并重启的方式设置二进制日志的话，还可以使用如下指令，需要注意的是在mysql8中`只有 会话级别` 的设置，没有了global级别的设置。
+
+```sql
+# session级别 
+mysql> SET sql_log_bin=0; 
+Query OK, 0 rows affected (0.01 秒)
+```
+#### 查看日志
+
+> - 查看日志文件列表
+>
+>   ```sql
+>   show binary logs;
+>   ```
+>
+>   <img src="https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20221030150133291.png" alt="image-20221030150133291" style="zoom:50%;" />
+>
+> - 将行事件以 伪SQL的形式 表现出来
+>
+>   ```shell
+>   mysqlbinlog -v "/var/lib/mysql/binlog/atguigu-bin.000002" 
+>   ```
+>
+>   <img src="https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20221030150246570.png" alt="image-20221030150246570" style="zoom:50%;" />
+>
+> - 其他常用命令
+>
+>   ```shell
+>   # 可查看参数帮助 
+>   mysqlbinlog --no-defaults --help 
+>   # 查看最后100行 
+>   mysqlbinlog --no-defaults --base64-output=decode-rows -vv atguigu-bin.000002 |tail -100 
+>   # 根据position查找 
+>   mysqlbinlog --no-defaults --base64-output=decode-rows -vv atguigu-bin.000002 |grep -A 20 '4939002'
+>   ```
+>
+> - 上面这种办法读取出binlog日志的全文内容比较多，不容易分辨查看到pos点信息，下面介绍一种更为方便的查询命令：
+>
+>   ```sql
+>   show binlog events [IN 'log_name'] [FROM pos] [LIMIT [offset,] row_count];
+>   ```
+>
+>   - IN 'log_name' ：指定要查询的binlog文件名（不指定就是第一个binlog文件）　
+>   - FROM pos ：指定从哪个pos起始点开始查起（不指定就是从整个文件首个pos点开始算）
+>   - LIMIT [offset] ：偏移量(不指定就是0) 
+>   - row_count :查询总条数（不指定就是所有行）
+>   - ![image-20221030151613820](https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20221030151613820.png)
+>     - Query：开始一个事务
+>     - Table_map：映射需要的表
+>     - Write_rows：插入数据
+>     - Update_rows：更新数据
+>     - Delete_rows：删除数据
+>     - Xid：结束一个事务
+>
+> - binlog的格式
+>
+>   ```sql
+>   show variables like 'binlog_format';
+>   ```
+>
+>   - **Statement**
+>
+>     每一条会修改数据的sql都会记录在binlog中。优点：不需要记录每一行的变化，减少了binlog日志量，节约了IO，提高性能。
+>
+>   - **Row** 
+>
+>     5.1.5版本的MySQL才开始支持row level 的复制，它不记录sql语句上下文相关信息，仅保存哪条记录被修改。优点：row level 的日志内容会非常清楚的记录下每一行数据修改的细节。而且不会出现某些特定情况下的存储过程，或function，以及trigger的调用和触发无法被正确复制的问题。
+>
+>   - **Mixed** 
+>
+>     从5.1.8版本开始，MySQL提供了Mixed格式，实际上就是Statement与Row的结合。
+
+#### 使用日志恢复数据
+
+> 使用`flush logs`，新建一个日志文件，防止在原有的日志文件中修改。 
+>
+> ```shell
+> mysqlbinlog [option] filename|mysql –uuser -ppass;
+> ```
+>
+> 这个命令可以这样理解：使用mysqlbinlog命令来读取filename中的内容，然后使用mysql命令将这些内容恢复到数据库中。
+>
+> option ：可选项，比较重要的两对option参数是--start-date、--stop-date 和 --start-position、-- stop-position。 
+>
+> - --start-date 和 --stop-date ：可以指定恢复数据库的起始时间点和结束时间点。
+>
+> - --start-position和--stop-position ：可以指定恢复数据的开始位置和结束位置。
+>
+> filename ：是日志文件名。
+>
+> 举例：从begin开始，到commit结束
+>
+> ```shell
+> mysqlbinlog --start-position=235 --stop-position=773 --database=atguigudb1 atguigu-bin.000001 | mysql -uroot -p123456 -v atguigudb1
+> ```
+>
+> <img src="https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20221030154503660.png" alt="image-20221030154503660" style="zoom:30%;" />
+
+> 注意：使用mysqlbinlog命令进行恢复操作时，必须是编号小的先恢复，例如atguigu-bin.000001须在atguigu-bin.000002之前恢复。
+
+#### 删除二进制日志
+
+> MySQL的二进制文件可以配置自动删除，同时MySQL也提供了安全的手动删除二进制文件的方法。`PURGE MASTER LOGS 只删除指定部分的二进制日志文件， RESET MASTER 删除所有的二进制日志文件(慎用)`。具体如下：
+>
+> ```sql
+> PURGE {MASTER | BINARY} LOGS TO ‘指定日志文件名’ 
+> PURGE {MASTER | BINARY} LOGS BEFORE ‘指定日期’
+> reset master;
+> 
+> -- 将'atguigu-bin.000002'之前的文件全部删除，不包括'atguigu-bin.000002';
+> purge master logs to 'atguigu-bin.000002';
+> ```
+
+#### 其它场景
+
+> 二进制日志可以通过数据库的 全量备份 和二进制日志中保存的 增量信息 ，完成数据库的 无损失恢复 。但是，如果遇到数据量大、数据库和数据表很多（比如分库分表的应用）的场景，用二进制日志进行数据恢复，是很有挑战性的，因为起止位置不容易管理。
+>
+> 在这种情况下，一个有效的解决办法是 `配置主从数据库服务器` ，甚至是 一主多从 的架构，把二进制日志文件的内容通过中继日志，同步到从数据库服务器中，这样就可以有效避免数据库故障导致的数据异常等问题。
+
+### 再谈二进制日志(binlog)
+
+#### 写入机制
+
+> binlog的写入时机也非常简单，事务执行过程中，先把日志写到 `binlog cache` ，事务提交的时候，再把binlog cache写到binlog文件中。因为一个事务的binlog不能被拆开，无论这个事务多大，也要确保一次性写入，所以系统会给每个线程分配一个块内存作为binlog cache。 设置`binlog_cache_size`控制每个线程分配的内存大小。
+>
+> 写入整体流程如下：`write和fsync的时机`，可以由参数 `sync_binlog` 控制，默认是 `0` 。
+>
+> - `0的时候`，表示每次提交事务都只write，由系统自行判断什么时候执行fsync。虽然性能得到提升，但是机器宕机，page cache里面的binglog 会丢失。
+> - `设置为 1` ，表示每次提交事务都会执行fsync，就如同**redo log** **刷盘流程**一样。最后还有一种折中方式，可以`设置为N(N>1)`，表示每次提交事务都write，但累积N个事务后才fsync。
+>
+> <img src="https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20221031093058756.png" alt="image-20221031093058756" style="zoom:50%;" />
+
+
+
+#### binlog与redolog对比
+
+> redo log 它是 `物理日志` ，记录内容是“在某个数据页上做了什么修改”，属于 InnoDB 存储引擎层产生的。让Innodb存储引擎有了崩溃恢复的能力。主要作用是短时间内存储，大小为48MB。当日志中的checkpoint和write pos要重合，就会执行刷盘，将redolog中的数据刷入到数据库中。如果是使用binlog进行刷入的话，binlog没有记录刷入开始的地方。
+>
+> 而 binlog 是 `逻辑日志` ，记录内容是语句的原始逻辑，类似于“给 ID=2 这一行的 c 字段加 1”，属于MySQL Server 层。保证了mysql集群的恢复数据和主从复制。主要作用是归档，大小为1GB
+
+#### 两阶段提交
+
+> 在执行更新语句过程，会记录redo log与binlog两块日志，以基本的事务为单位，redo log在事务执行过程中可以不断写入，而binlog只有在提交事务时才写入，所以`redo log与binlog的 写入时机 不一样`，如果在已经写入redolog后，mysql服务器出现了宕机，binlog没有写入，会导致redolog和binlog的数据出现不一致的情况，导致主机和从机的数据不一致。为了解决两份日志之间的逻辑一致问题，InnoDB存储引擎使用`两阶段提交方案`
+>
+> <img src="https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20221031101522581.png" alt="image-20221031101522581" style="zoom:50%;" />
+>
+> 原理：将redolog的写入分成了两个阶段：prepare和commit。如果服务器宕机重启，先检查是否有commit阶段，如果有则提交事务，如果没有，则检查能否通过事务id找到binlog日志，如果没有找到则直接回滚，找到则提交事务。
+>
+> <img src="https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20221031102612655.png" alt="image-20221031102612655" style="zoom:70%;" />
+
+### 中继日志(relay log)
+
+#### 介绍
+
+> 中继日志只在主从服务器架构的`从服务器上存在`。从服务器为了与主服务器保持一致，要从主服务器读取二进制日志的内容，并且把读取到的信息写入 本地的日志文件 中，这个从服务器本地的日志文件就叫`中继日志` 。然后，从服务器读取中继日志，并根据中继日志的内容对从服务器的数据进行更新，完成主从服务器的 数据同步 。
+>
+> 搭建好主从服务器之后，中继日志默认会保存在从服务器的数据目录下。
+>
+> 文件名的格式是： 从服务器名 `-relay-bin.序号` 。中继日志还有一个索引文件： 从服务器名 -relay- bin.index ，用来定位当前正在使用的中继日志。
+
+#### 查看中继日志
+
+> 中继日志与二进制日志的格式相同，可以用 `mysqlbinlog` 工具进行查看。
+
+#### 恢复的典型错误
+
+> 如果从服务器宕机，有的时候为了系统恢复，要重装操作系统，这样就可能会导致你的 `服务器名称 与之前 不同` 。而中继日志里是 包含从服务器名 的。在这种情况下，就可能导致你恢复从服务器的时候，无法从宕机前的中继日志里读取数据，以为是日志文件损坏了，其实是名称不对了。解决的方法也很简单，把从服务器的名称改回之前的名称
+
+## 主从复制
+
+### 主从复制概述
+
+#### 如何提升数据库并发能力
+
+> 此外，一般应用对数据库而言都是“ `读多写少` ”，也就说对数据库读取数据的压力比较大，有一个思路就是采用数据库集群的方案，做 `主从架构 、进行 读写分离` ，这样同样可以提升数据库的并发处理能力。但并不是所有的应用都需要对数据库进行主从架构的设置，毕竟设置架构本身是有成本的。
+>
+> 如果我们的目的在于提升数据库高并发访问的效率，那么首先考虑的是如何 优化SQL和索引 ，这种方式简单有效；其次才是采用 缓存的策略 ，比如使用 Redis将热点数据保存在内存数据库中，提升读取的效率；最后才是对数据库采用 主从架构 ，进行读写分离。
+
+#### 主从复制的作用
+
+> 主从同步设计不仅可以提高`数据库的吞吐量`，还有以下 3 个方面的作用。
+>
+> - 读写分离
+>
+> - 数据备份。
+>
+> - 具有高可用性。
+
+### 主从复制的原理
+
+> Slave 会从 Master 读取 `binlog` 来进行数据同步。
+
+#### 原理剖析
+
+##### 三个线程
+
+> 实际上主从同步的原理就是基于 binlog 进行数据同步的。在主从复制过程中，会基于 3 个线程来操作，一个主库线程，两个从库线程。
+>
+> <img src="https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20221031163200244.png" alt="image-20221031163200244" style="zoom:70%;" />
+>
+> `二进制日志转储线程 （Binlog dump thread）`是一个主库线程。当从库线程连接的时候， 主库可以将二进制日志发送给从库，当主库读取事件（Event）的时候，会在 Binlog 上 加锁 ，读取完成之后，再将锁释放掉。
+>
+> `从库 I/O 线程` 会连接到主库，向主库发送请求更新 Binlog。这时从库的 I/O 线程就可以读取到主库的二进制日志转储线程发送的 Binlog 更新部分，并且拷贝到本地的中继日志 （Relay log）。
+>
+> `从库 SQL 线程` 会读取从库中的中继日志，并且执行日志中的事件，将从库中的数据与主库保持同步
+
+##### 复制三步骤
+
+> 步骤 1 ：Master将写操作记录到二进制日志（binlog）。
+>
+> 步骤 2 ：Slave将Master的binary log events拷贝到它的中继日志（relay log）；
+>
+> 步骤 3 ：Slave重做中继日志中的事件，将改变应用到自己的数据库中。 MySQL复制是异步的且串行化的，而且重启后从接入点开始复制。
+
+**复制的问题**
+
+> 复制的最大问题：延时
+
+#### 复制的基本原则
+
+> 每个 Slave 只有一个 Master
+>
+> 每个 Slave 只能有一个唯一的服务器ID
+>
+> 每个 Master 可以有多个 Slave 
+
+### 一主一从架构搭建
+
+> 一台主机用于处理所有写请求，一台从机负责所有读请求，架构图如下：
+
+<img src="https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20221031163633568.png" alt="image-20221031163633568" style="zoom:50%;" />
+
+
+#### 准备工作
+
+> 1、准备 `2台 CentOS` 虚拟机
+>
+> 2、每台虚拟机上需要安装好MySQL (可以是MySQL8.0 ) 
+>
+> 说明：前面我们讲过如何克隆一台CentOS。大家可以在一台CentOS上安装好MySQL，进而通过克隆的方 式复制出1台包含MySQL的虚拟机。 
+>
+> 注意：克隆的方式需要修改新克隆出来主机的：`① MAC地址 ② hostname ③ IP 地址 ④ UUID 。` 
+>
+> 此外，克隆的方式生成的虚拟机（包含MySQL Server），则克隆的虚拟机MySQL Server的UUID相同，必 须修改，否则在有些场景会报错。比如： show slave status\G ，报如下的错误： 
+>
+> ```shell
+> Last_IO_Error: Fatal error: The slave I/O thread stops because master and slave have equal MySQL server UUIDs; these UUIDs must be different for replication to work.
+> ```
+>
+> `修改MySQL Server 的UUID`方式：
+>
+> ```shell
+> vim /var/lib/mysql/auto.cnf 
+> systemctl restart mysqld
+> ```
+
+#### 主机配置文件
+
+> 建议mysql版本一致且后台以服务运行，主从所有配置项都配置在[mysqld]节点下，且都是小写字母。具体参数配置如下，`注意重启服务`，先搭建主从复制，才创建数据库
+>
+> - 必选
+>
+>   ```shell
+>   #[必须]主服务器唯一ID 
+>   server-id=1 
+>   #[必须]启用二进制日志,指名路径。比如：自己本地的路径/log/mysqlbin 
+>   log-bin=atguigu-bin
+>   ```
+>
+> - 可选
+>
+>   ```shell
+>   #[可选] 0（默认）表示读写（主机），1表示只读（从机） 
+>   read-only=0 
+>   #设置日志文件保留的时长，单位是秒 
+>   binlog_expire_logs_seconds=6000 
+>   #控制单个二进制日志大小。此参数的最大和默认值是1GB 
+>   max_binlog_size=200M 
+>   #[可选]设置不要复制的数据库 
+>   binlog-ignore-db=test 
+>   #[可选]设置需要复制的数据库,默认全部记录。比如：binlog-do-db=atguigu_master_slave 
+>   binlog-do-db=需要复制的主数据库名字 
+>   #[可选]设置binlog格式 
+>   binlog_format=STATEMEN
+>   ```
+
+**binlog格式设置：**
+
+- **STATEMENT模式（基于SQL语句的复制(statement-based replication, SBR)）**
+
+> ```shell
+> binlog_format=STATEMENT
+> ```
+>
+> 每一条会修改数据的`sql语句会记录到binlog`中。这是`默认`的binlog格式。
+>
+> SBR 的`优点`：
+>
+> - 历史悠久，技术成熟
+>
+> - 不需要记录每一行的变化，减少了binlog日志量，文件较小
+>
+> - binlog中包含了所有数据库更改信息，可以据此来审核数据库的安全等情况
+>
+> - binlog可以用于实时的还原，而不仅仅用于复制
+>
+> - 主从版本可以不一样，从服务器版本可以比主服务器版本高
+>
+> SBR 的`缺点`：
+>
+> - 不是所有的UPDATE语句都能被复制，尤其是包含不确定操作的时候
+>
+> - 使用以下函数的语句也无法被复制：LOAD_FILE()、UUID()、USER()、FOUND_ROWS()、SYSDATE() (除非启动时启用了 --sysdate-is-now 选项) 
+>
+> - INSERT ... SELECT 会产生比 RBR 更多的行级锁
+>
+> - 复制需要进行全表扫描(WHERE 语句中没有使用到索引)的 UPDATE 时，需要比 RBR 请求更多的行级锁
+>
+> - 对于有 AUTO_INCREMENT 字段的 InnoDB表而言，INSERT 语句会阻塞其他 INSERT 语句
+>
+> - 对于一些复杂的语句，在从服务器上的耗资源情况会更严重，而 RBR 模式下，只会对那个发生变化的记录产生影响
+>
+> - 执行复杂语句如果出错的话，会消耗更多资源
+>
+> - 数据表必须几乎和主服务器保持一致才行，否则可能会导致复制出错
+
+- **ROW模式（基于行的复制(row-based replication, RBR)）**
+
+> ```shell
+> binlog_format=ROW
+> ```
+>
+> `5.1.5版本`的MySQL才开始支持，不记录每条sql语句的上下文信息，仅`记录哪条数据被修改了，修改成什么样了`。
+>
+> RBR 的`优点`：
+>
+> - 任何情况都可以被复制，这对复制来说是最 安全可靠 的。（比如：不会出现某些特定情况下的存储过程、function、trigger的调用和触发无法被正确复制的问题）
+>
+> - 多数情况下，从服务器上的表如果有主键的话，复制就会快了很多
+>
+> - 复制以下几种语句时的行锁更少：INSERT ... SELECT、包含 AUTO_INCREMENT 字段的 INSERT、没有附带条件或者并没有修改很多记录的 UPDATE 或 DELETE 语句
+>
+> - 执行 INSERT，UPDATE，DELETE 语句时锁更少
+>
+> - 从服务器上采用 多线程 来执行复制成为可能
+>
+> RBR 的`缺点`：
+>
+> - binlog 大了很多
+>
+> - 复杂的回滚时 binlog 中会包含大量的数据
+>
+> - 主服务器上执行 UPDATE 语句时，所有发生变化的记录都会写到 binlog 中，而 SBR 只会写一次，这会导致频繁发生 binlog 的并发写问题
+>
+> - 无法从 binlog 中看到都复制了些什么语句
+
+- **MIXED模式（混合模式复制(mixed-based replication, MBR)）**
+
+> ```shell
+> binlog_format=MIXED
+> ```
+>
+> 从`5.1.8版本`开始，MySQL提供了Mixed格式，实际上就是Statement与Row的结合
+>
+> 在Mixed模式下，一般的语句修改使用statment格式保存binlog。如一些函数，statement无法完成主从复制的操作，则采用row格式保存binlog。
+>
+> MySQL会根据执行的每一条具体的sql语句来区分对待记录的日志形式，也就是在Statement和Row之间选择一种。
+
+#### 从机配置文件
+
+> 要求主从所有配置项都配置在my.cnf的[mysqld]栏位下，且都是小写字母。重启后台mysql服务，使配置生效。
+>
+> - 必选
+>
+>   ```shell
+>   #[必须]从服务器唯一ID 
+>   server-id=2
+>   ```
+>
+> - 可选
+>
+>   ```shell
+>   #[可选]启用中继日志 
+>   relay-log=mysql-relay
+>   ```
+
+#### 主机：建立账户并授权
+
+> 注意：如果使用的是mysql5.5,5.7
+>
+> ```sql
+> #在主机MySQL里执行授权主从复制的命令 
+> GRANT REPLICATION SLAVE ON *.* TO 'slave1'@'从机器数据库IP' IDENTIFIED BY 'abc123'; 
+> ```
+>
+> MySQL8，需要如下的方式建立账户，并授权slave
+>
+> ```sql
+> CREATE USER 'slave1'@'%' IDENTIFIED BY '123456';
+> GRANT REPLICATION SLAVE ON *.* TO 'slave1'@'%';
+> #此语句必须执行。否则见下面。
+> ALTER USER 'slave1'@'%' IDENTIFIED WITH mysql_native_password BY '123456';
+> flush privileges;
+> ```
+>
+> 查询Master的状态，并记录下`File和Position`的值。注意：执行完此步骤后**不要再操作主服务器****MySQL**，防止主服务器状态值变化。
+>
+> ```sql
+> show master status;
+> ```
+>
+> ![image-20221031180006044](https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20221031180006044.png)
+
+#### 从机：配置需要复制的主机
+
+##### 步骤 1 ： 从机上复制主机的命令
+
+```sql
+CHANGE MASTER TO MASTER_HOST='主机的IP地址', MASTER_USER='主机用户名', MASTER_PASSWORD='主机用户名的密码', MASTER_LOG_FILE='mysql-bin.具体数字', MASTER_LOG_POS=具体值;
+
+CHANGE MASTER TO MASTER_HOST ='10.211.55.1', MASTER_USER ='slave1', MASTER_PASSWORD ='123456',
+    MASTER_LOG_FILE ='atguigu-bin.000001', MASTER_LOG_POS =156;
+```
+
+##### 步骤 2 
+
+```sql
+#启动slave同步 
+START SLAVE;
+```
+
+> 如果报错，可以执行如下操作，删除之前的relay_log信息。然后重新执行 CHANGE MASTER TO ...语句即可。
+
+![image-20221031180653040](https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20221031180653040.png)
+
+```sql
+reset slave; #删除SLAVE数据库的relaylog日志文件，并重新启用新的relaylog文件
+```
+
+> 查看同步状态
+>
+> ```sql
+> SHOW SLAVE STATUS\G;
+> ```
+>
+> <img src="https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20221031180911521.png" alt="image-20221031180911521" style="zoom:50%;" />
+
+> 可能的错误原因：
+>
+> 1. 网络不通 
+>
+> 2. 账户密码错误 
+>
+> 3. 防火墙 
+>
+> 4. mysql配置文件问题 
+>
+> 5. 连接服务器时语法 
+>
+> 6. 主服务器mysql权限
+
+
+#### 测试
+
+> 主机新建库、新建表、insert记录，从机复制：
+>
+> ```sql
+> CREATE DATABASE atguigu_master_slave; 
+> CREATE TABLE mytbl(id INT,NAME VARCHAR(16)); 
+> INSERT INTO mytbl VALUES(1, 'zhang3'); 
+> INSERT INTO mytbl VALUES(2,@@hostname);
+> ```
+
+#### 停止主从同步
+
+> 停止主从同步命令：
+>
+> ```sql
+> stop slave;
+> ```
+>
+> 如何重新配置主从
+>
+> 如果停止从服务器复制功能，再使用需要重新配置主从。否则会报错如下：
+>
+> 重新配置主从，需要在从机上执行：
+>
+> ```sql
+> stop slave; 
+> reset master; #删除Master中所有的binglog文件，并将日志索引文件清空，重新开始所有新的日志文件(慎用)
+> ```
+
+### 同步数据一致性问题
+
+> **主从同步的要求：**
+>
+> - 读库和写库的数据一致(最终一致)；
+> - 写数据必须写到写库；
+> - 读数据必须到读库(不一定)；
+
+#### 理解主从延迟问题
+
+> 进行主从同步的内容是二进制日志，它是一个文件，在进行网络传输的过程中就一定会存在主从延迟（比如 500 ms），这样就可能造成用户在从库上读取的数据不是最新的数据，也就是主从同步中的数据不一致性问题。
+
+#### 主从延迟问题原因
+
+> 在网络正常的时候，日志从主库传给从库所需的时间是很短的，即T2-T1的值是非常小的。即，网络正常情况下，主备延迟的主要来源是备库接收完binlog和执行完这个事务之间的时间差。
+>
+> **主备延迟最直接的表现是，从库消费中继日志（relay log）的速度，比主库生产binlog的速度要慢**。造成原因：
+>
+> 1、从库的机器性能比主库要差
+>
+> 2、从库的压力大
+>
+> 3、大事务、慢sql 的执行
+
+#### 如何减少主从延迟
+
+> 1. 降低多线程大事务并发的概率，优化业务逻辑
+>
+> 2. 优化SQL，避免慢SQL， 减少批量操作 ，建议写脚本以update-sleep这样的形式完成。
+>
+> 3. 提高从库机器的配置 ，减少主库写binlog和从库读binlog的效率差。
+>
+> 4. 尽量采用 短的链路 ，也就是主库和从库服务器的距离尽量要短，提升端口带宽，减少binlog传输的网络延时。
+>
+> 5. 实时性要求的业务读强制走主库，从库只做灾备，备份。
+
+#### 如何解决一致性问题
+
+##### 方法 1 ：异步复制
+
+> 客户端提交commit后，不需要等待从库返回任何结果，而是继续执行其他事务的commit操作。好处就是效率高，但是当主库宕机，binlog日志还没有同步到从库的relay log中，会出现数据的一致性问题，这个方案的一致性比较弱。
+
+<img src="https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20221101114011729.png" alt="image-20221101114011729" style="zoom:50%;" />
+
+##### 方法 2 ：半同步复制
+
+>  MySQL5.5之后支持半同步复制，客户端提交后不会直接返回结果，而是保证至少有`一个`从库接收到binlog日志并写入到relay 日志后，返回了结果，才返回给客户端。提高了数据的一致性，但是有网络的延迟，降低了主库写的效率。
+>
+> MySQL5.7 可以通过设置`rpl_semi_sync_master_wait_for_slave_count`可以设置等待从库的数量。
+
+<img src="https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20221101114902202.png" alt="image-20221101114902202" style="zoom:50%;" />
+
+##### 方法 3 ：组复制
+
+> 异步复制和半同步复制都无法最终保证数据的一致性问题，半同步复制是通过判断从库响应的个数来决定是否返回给客户端，虽然数据一致性相比于异步复制有提升，但仍然无法满足对数据一致性要求高的场景，比如金融领域。MGR 很好地弥补了这两种复制模式的不足。组复制技术，简称 `MGR`（MySQL Group Replication）。是 MySQL 在 5.7.17 版本中推出的一种新的数据复制技术，这种复制技术是基于 `Paxos 协议`的状态机复制。
+>
+> **MGR** **是如何工作的**
+>
+> 首先我们将多个节点共同组成一个复制组，在 执行读写（RW）事务 的时候，需要通过一致性协议层（Consensus 层）的同意，也就是读写事务想要进行提交，必须要经过组里“大多数人”（对应 Node 节点）的同意，大多数指的是同意的节点数量需要大于 `（N/2+1）`，这样才可以进行提交，而不是原发起方一个说了算。而针对 只读（RO）事务 则不需要经过组内同意，直接 COMMIT 即可。在一个复制组内有多个节点组成，它们各自维护了自己的数据副本，并且在一致性协议层实现了原子消息和全局有序消息，从而保证组内数据的一致性。
+>
+> ![image-20221101115957356](https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20221101115957356.png)
+>
+> MGR 将 MySQL 带入了数据强一致性的时代，是一个划时代的创新，其中一个重要的原因就是MGR 是基于 Paxos 协议的。Paxos 算法是由 2013 年的图灵奖获得者 Leslie Lamport 于 1990 年提出的，有关这个算法的决策机制可以搜一下。事实上，Paxos 算法提出来之后就作为 `分布式一致性算法` 被广泛应用，比如Apache 的 ZooKeeper 也是基于 Paxos 实现的。
+
+## 数据库备份与恢复
+
+### 物理备份与逻辑备份
+
+> **物理备份**：备份数据文件，`转储数据库物理文件`到某一目录。物理备份恢复速度比较快，但占用空间比较大，MySQL中可以用 xtrabackup 工具来进行物理备份。
+>
+> **逻辑备份**：对数据库对象利用工具进行导出工作，汇总入备份文件内。逻辑备份恢复速度慢，但占用空间小，更灵活。MySQL 中常用的逻辑备份工具为 mysqldump 。逻辑备份就是 `备份sql语句` ，在恢复的时候执行备份的sql语句实现数据库数据的重现。 
+
+### mysqldump实现逻辑备份
+
+#### 备份一个数据库
+
+> 备份的文件并非一定要求后缀名为.sql，例如后缀名为.txt的文件也是可以的。
+
+ ```shell
+ mysqldump –u 用户名称 –h 主机名称 –p密码 待备份的数据库名称[tbname, [tbname...]]> 备份文件名称.sql
+ 
+ -- 举例：备份atguigu01数据库
+ mysqldump -uroot -p atguigu01>atguigu01.sql
+ ```
+
+#### 备份全部数据库
+
+> 若想用mysqldump备份整个实例，可以使用 `--all-databases 或 - A` 参数：
+
+
+```shell
+ mysqldump -uroot -p --all-databases> all_databases.sql
+```
+
+#### 备份部分数据库
+
+> 使用 `--databases 或 -B` 参数了，该参数后面跟数据库名称，多个数据库间用空格隔开。如果指定`databases`参数，备份文件中会存在创建数据库的语句，如果不指定参数，则不存在。
+>
+
+```shell
+mysqldump –u user –h host –p --databases [数据库的名称1 [数据库的名称2...]] > 备份文件名 称.sql 
+mysqldump -uroot -p --databases atguigu atguigu12 >two_database.sql 
+mysqldump -uroot -p -B atguigu atguigu12 > two_database.sql
+```
+
+#### 备份部分表
+
+```shell
+mysqldump –u user –h host –p 数据库的名称 [表名1 [表名2...]] > 备份文件名称.sql 
+mysqldump -uroot -p atguigu book> book.sql
+#备份多张表 
+mysqldump -uroot -p atguigu book account > 2_tables_bak.sql
+```
+
+#### 备份单表的部分数据
+
+> 有些时候一张表的数据量很大，我们只需要部分数据。这时就可以使用 `--where` 选项了。where后面附带需要满足的条件。
+
+```shell
+-- 备份student表中id小于10的数据
+mysqldump -uroot -p atguigu student --where="id < 10 " > student_part_id10_low_bak.sql
+```
+
+#### 排除某些表的备份
+
+> 如果我们想备份某个库，但是某些表数据量很大或者与业务关联不大，这个时候可以考虑排除掉这些表，同样的，选项 `--ignore-table` 可以完成这个功能。
+
+```shell
+mysqldump -uroot -p atguigu --ignore-table=atguigu.student > no_stu_bak.sql 
+
+# 通过如下指定判定文件中没有student表结构
+grep "student" no_stu_bak.sql
+```
+
+#### 只备份结构或只备份数据
+
+> 只备份结构的话可以使用 `--no-data` 简写为 `-d` 选项；只备份数据可以使用 `--no-create-info` 简写为`-t` 选项。
+
+```shell
+# 只备份结构
+mysqldump -uroot -p atguigu --no-data > atguigu_no_data_bak.sql 
+#使用grep命令，没有找到insert相关语句，表示没有数据备份。 
+grep "INSERT" atguigu_no_data_bak.sql 
+
+# 只备份数据
+mysqldump -uroot -p atguigu --no-create-info > atguigu_no_create_info_bak.sql 
+#使用grep命令，没有找到create相关语句，表示没有数据结构。 
+grep "CREATE" atguigu_no_create_info_bak.sql [root@node1 ~]
+```
+
+#### 备份中包含存储过程、函数、事件
+
+> mysqldump备份默认是`不包含`存储过程，自定义函数及事件的。可以使用 `--routines` 或 `-R` 选项来备份存储过程及函数，使用 `--events` 或 `-E` 参数来备份事件
+
+```shell
+mysqldump -uroot -p -R -E --databases atguigu > fun_atguigu_bak.sql
+```
+#### mysqldump常用选项
+
+```shell
+--add-drop-database：在每个CREATE DATABASE语句前添加DROP DATABASE语句。
+--add-drop-tables：在每个CREATE TABLE语句前添加DROP TABLE语句。
+--add-locking：用LOCK TABLES和UNLOCK TABLES语句引用每个表转储。重载转储文件时插入得更快。
+--all-database, -A：转储所有数据库中的所有表。与使用--database选项相同，在命令行中命名所有数据库。
+--comment[=0|1]：如果设置为0，禁止转储文件中的其他信息，例如程序版本、服务器版本和主机。--skip- comments与--comments=0的结果相同。默认值为1，即包括额外信息。
+--compact：产生少量输出。该选项禁用注释并启用--skip-add-drop-tables、--no-set-names、--skip- disable-keys和--skip-add-locking选项。
+--compatible=name：产生与其他数据库系统或旧的MySQL服务器更兼容的输出，值可以为ansi、MySQL323、 MySQL40、postgresql、oracle、mssql、db2、maxdb、no_key_options、no_table_options或者 no_field_options。
+--complete_insert, -c：使用包括列名的完整的INSERT语句。
+--debug[=debug_options], -#[debug_options]：写调试日志。
+--delete，-D：导入文本文件前清空表。
+--default-character-set=charset：使用charsets默认字符集。如果没有指定，就使用utf8。
+--delete--master-logs：在主复制服务器上，完成转储操作后删除二进制日志。该选项自动启用-master- data。
+--extended-insert，-e：使用包括几个VALUES列表的多行INSERT语法。这样使得转储文件更小，重载文件时可 以加速插入。
+--flush-logs，-F：开始转储前刷新MySQL服务器日志文件。该选项要求RELOAD权限。
+--force，-f：在表转储过程中，即使出现SQL错误也继续。
+--lock-all-tables，-x：对所有数据库中的所有表加锁。在整体转储过程中通过全局锁定来实现。该选项自动关 闭--single-transaction和--lock-tables。
+--lock-tables，-l：开始转储前锁定所有表。用READ LOCAL锁定表以允许并行插入MyISAM表。对于事务表（例 如InnoDB和BDB），--single-transaction是一个更好的选项，因为它根本不需要锁定表。
+--no-create-db，-n：该选项禁用CREATE DATABASE /*!32312 IF NOT EXIST*/db_name语句，如果给出- -database或--all-database选项，就包含到输出中。
+--no-create-info，-t：只导出数据，而不添加CREATE TABLE语句。
+--no-data，-d：不写表的任何行信息，只转储表的结构。
+--opt：该选项是速记，它可以快速进行转储操作并产生一个能很快装入MySQL服务器的转储文件。该选项默认开启， 但可以用--skip-opt禁用。
+--password[=password]，-p[password]：当连接服务器时使用的密码。
+-port=port_num，-P port_num：用于连接的TCP/IP端口号。
+--protocol={TCP|SOCKET|PIPE|MEMORY}：使用的连接协议。
+--replace，-r –replace和--ignore：控制替换或复制唯一键值已有记录的输入记录的处理。如果指定--
+replace，新行替换有相同的唯一键值的已有行；如果指定--ignore，复制已有的唯一键值的输入行被跳过。如果不 指定这两个选项，当发现一个复制键值时会出现一个错误，并且忽视文本文件的剩余部分。
+--silent，-s：沉默模式。只有出现错误时才输出。
+--socket=path，-S path：当连接localhost时使用的套接字文件（为默认主机）。
+--user=user_name，-u user_name：当连接服务器时MySQL使用的用户名。
+--verbose，-v：冗长模式，打印出程序操作的详细信息。
+--xml，-X：产生XML输出
+```
+### mysql命令恢复数据
+
+#### 恢复单库
+
+> 使用root用户，将之前练习中备份的atguigu.sql文件中的备份导入数据库中，命令如下：如果备份文件中`包含了创建数据库的语句，则恢复的时候不需要指定数据库名称`
+
+```shell
+mysql –uroot –p [dbname] < backup.sql
+mysql -uroot -p < atguigu.sql 
+mysql -uroot -p atguigu4< atguigu.sql
+```
+
+#### 从全量备份中恢复单库
+
+> 可能有这样的需求，比如说我们只想`恢复某一个库`，但是我们有的是整个实例的备份，这个时候我们可以从全量备份中分离出单个库的备份。
+
+```shell
+sed -n '/^-- Current Database: `atguigu`/,/^-- Current Database: `/p' all_database.sql > atguigu.sql
+#分离完成后我们再导入atguigu.sql即可恢复单个库
+```
+
+#### 从单库备份中恢复单表
+
+```shell
+# 分离出表结构
+cat atguigu.sql | sed -e '/./{H;$!d;}' -e 'x;/CREATE TABLE `class`/!d;q' > class_structure.sql 
+# 分离出表数据
+cat atguigu.sql | grep --ignore-case 'insert into `class`' > class_data.sql 
+#用shell语法分离出创建表的语句及插入数据的语句后 再依次导出即可完成恢复 
+
+use atguigu; 
+source class_structure.sql; 
+source class_data.sql; 
+```
+### 物理备份：直接复制整个数据库
+
+> 直接将MySQL中的数据库`文件复制`出来。这种方法最简单，速度也最快。MySQL的数据库目录位置不一定相同：
+>
+> ```shell
+> cp -r atguigu01 ./backup
+> ```
+>
+> - 在Windows平台下，MySQL 8.0存放数据库的目录通常默认为 “ C:\ProgramData\MySQL\MySQL Server 8.0\Data ”或者其他用户自定义目录；
+>
+> - 在Linux平台下，数据库目录位置通常为/var/lib/mysql/； 
+>
+> - 在MAC OSX平台下，数据库目录位置通常为“/usr/local/mysql/data”
+>
+> 但为了保证备份的一致性。需要保证：
+>
+> - 方式1：备份前，将服务器停止。
+>
+> - 方式2：备份前，对相关表执行 `FLUSH TABLES WITH READ LOCK` 操作。这样当复制数据库目录中的文件时，允许其他客户继续查询表。同时，FLUSH TABLES语句来确保开始备份前将所有激活的索引页写入硬盘。
+>
+> 这种方式方便、快速，但不是最好的备份方法，因为实际情况可能 不允许停止MySQL服务器 或者 锁住 表 ，而且这种方法 对InnoDB存储引擎 的表不适用。对于MyISAM存储引擎的表，这样备份和还原很方便，但是还原时最好是相同版本的MySQL数据库，否则可能会存在文件类型不同的情况。
+>
+> 注意，物理备份完毕后，执行 `UNLOCK TABLES` 来结算其他客户对表的修改行为。
+>
+> 说明： 在MySQL版本号中，第一个数字表示主版本号，主`版本号相同`的MySQL数据库文件格式相同。
+>
+> 此外，还可以考虑使用相关工具实现备份。比如， MySQLhotcopy 工具。MySQLhotcopy是一个Perl脚本，它使用LOCK TABLES、FLUSH TABLES和cp或scp来快速备份数据库。它是备份数据库或单个表最快的途径，但它只能运行在数据库目录所在的机器上，并且只能备份MyISAM类型的表。多用于mysql5.5之前。
+
+### 物理恢复：直接复制到数据库目录
+
+> **步骤：**
+>
+> 1）演示删除备份的数据库中指定表的数据
+>
+> 2）将备份的数据库数据拷贝到数据目录下，并`重启MySQL服务器`
+>
+> 3）查询相关表的数据是否恢复。需要使用下面的 `chown` 操作。
+>
+> **要求：**
+>
+> - 必须确保备份数据的数据库和待恢复的数据库服务器的`主版本号相同`。因为只有MySQL数据库主版本号相同时，才能保证这两个MySQL数据库文件类型是相同的。
+> - 这种方式对 MyISAM类型的表比较有效 ，对于InnoDB类型的表则不可用。因为InnoDB表的表空间不能直接复制。
+>
+> - 在Linux操作系统下，复制到数据库目录后，一定要将数据库的用户和组变成mysql，命令如下：
+>
+>   ```shell
+>   chown -R mysql.mysql /var/lib/mysql/dbname
+>   ```
+>
+>   其中，两个mysql分别表示组和用户；“-R”参数可以改变文件夹下的所有子文件的用户和组；“dbname”参数表示数据库目录。
+>
+> 提示 Linux操作系统下的权限设置非常严格。通常情况下，MySQL数据库只有root用户和mysql用户组下的mysql用户才可以访问，因此将数据库目录复制到指定文件夹后，一定要使用chown命令将文件夹的用户组变为mysql，将用户变为mysql。 
+
+### 表的导出与导入
+
+#### 表的导出
+
+##### 使用SELECT...INTO OUTFILE导出文本文件
+
+> mysql默认对导出的目录有`权限限制`，也就是说使用命令行进行导出的时候，需要指定目录进行操作。查询`secure_file_priv`值：
+>
+> ![image-20221102151123897](https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20221102151123897.png)
+>
+> ```sql
+> SELECT * FROM account INTO OUTFILE "/var/lib/mysql-files/account.txt";
+> ```
+
+##### 使用mysqldump命令导出文本文件
+
+> 使用mysqldump命令将将atguigu数据库中account表中的记录导出到文本文件，生成了account.sql和account.txt文件。打开account.sql文件，其内容包含创建account表的CREATE语句。打开account.txt文件，其内容只包含account表中的数据
+
+```shell
+mysqldump -uroot -p -T "/var/lib/mysql-files/" atguigu account
+```
+
+> 使用mysqldump将atguigu数据库中的account表导出到文本文件，使用FIELDS选项，要求`字段之间使用逗号“，”间隔`，所有字符类型字段值用`双引号`括起来：
+
+```shell
+mysqldump -uroot -p -T "/var/lib/mysql-files/" atguigu account --fields-terminated- by=',' --fields-optionally-enclosed-by='\"'
+```
+
+##### 使用mysql命令导出文本文件
+
+> 使用mysql语句导出atguigu数据中account表中的记录到文本文件：
+
+```shell
+mysql -uroot -p --execute="SELECT * FROM account;" atguigu> "/var/lib/mysqlfiles/account.txt"
+```
+
+#### 表的导入
+
+##### 使用LOAD DATA INFILE方式导入文本文件
+
+```shell
+LOAD DATA INFILE '/var/lib/mysql-files/account_0.txt' INTO TABLE atguigu.account;
+LOAD DATA INFILE '/var/lib/mysql-files/account_1.txt' INTO TABLE atguigu.account FIELDS TERMINATED BY ',' ENCLOSED BY '\"';
+```
+
+##### 使用mysqlimport方式导入文本文件
+
+```shell
+mysqlimport -uroot -p atguigu '/var/lib/mysql-files/account.txt' --fields-terminated- by=',' --fields-optionally-enclosed-by='\"'
+```
+### 数据库迁移
+
+#### 概述
+
+> 数据迁移（data migration）是指选择、准备、提取和转换数据，并**将数据从一个计算机存储系统永久地传输到另一个计算机存储系统的过程**。此外， 验证迁移数据的完整性 和 退役原来旧的数据存储 ，也被认为是整个数据迁移过程的一部分。
+>
+> 数据库迁移的原因是多样的，包括服务器或存储设备更换、维护或升级，应用程序迁移，网站集成，灾难恢复和数据中心迁移。
+>
+> 根据不同的需求可能要采取不同的迁移方案，但总体来讲，MySQL 数据迁移方案大致可以分为 `物理迁移 和 逻辑迁移` 两类。通常以尽可能 自动化 的方式执行，从而将人力资源从繁琐的任务中解放出来。
+
+#### 迁移方案
+
+> - 物理迁移
+>
+>   物理迁移适用于大数据量下的整体迁移。使用物理迁移方案的优点是比较快速，但需要停机迁移并且要求 MySQL 版本及配置必须和原服务器相同，也可能引起未知问题。物理迁移包括拷贝数据文件和使用 XtraBackup 备份工具两种。
+>
+>   不同服务器之间可以采用物理迁移，我们可以在新的服务器上安装好同版本的数据库软件，创建好相同目录，建议配置文件也要和原数据库相同，然后从原数据库方拷贝来数据文件及日志文件，配置好文件组权限，之后在新服务器这边使用 mysqld 命令启动数据库。
+>
+> - 逻辑迁移
+>
+>   逻辑迁移适用范围更广，无论是 部分迁移 还是 全量迁移 ，都可以使用逻辑迁移。逻辑迁移中使用最多的就是通过 mysqldump 等备份工具。
+
+#### 迁移注意点
+
+> **1.** **相同版本的数据库之间迁移注意点**
+>
+> 指的是在主版本号相同的MySQL数据库之间进行数据库移动。
+>
+> - 方式1： 因为迁移前后MySQL数据库的 主版本号相同 ，所以可以通过复制数据库目录来实现数据库迁移，但是物理迁移方式只适用于MyISAM引擎的表。对于InnoDB表，不能用直接复制文件的方式备份数据库。
+>
+> - 方式2： 最常见和最安全的方式是使用 mysqldump命令 导出数据，然后在目标数据库服务器中使用MySQL命令导入。
+>
+> 举例：
+>
+> 在上述语句中，“|”符号表示管道，其作用是将mysqldump备份的文件给mysql命令；“--all-databases”表示要迁移所有的数据库。通过这种方式可以直接实现迁移。
+>
+> **2.** **不同版本的数据库之间迁移注意点**
+>
+> 例如，原来很多服务器使用5.7版本的MySQL数据库，在8.0版本推出来以后，改进了5.7版本的很多缺陷，因此需要把数据库升级到8.0版本旧版本与新版本的MySQL可能使用不同的默认字符集，例如有的旧版本中使用latin1作为默认字符集，而最新版本的MySQL默认字符集为utf8mb4。如果数据库中有中文数据，那么迁移过程中需要对 默认字符集 进行修改 ，不然可能无法正常显示数据。高版本的MySQL数据库通常都会 兼容低版本 ，因此可以从低版本的MySQL数据库迁移到高版本的MySQL数据库。
+>
+> **3.** **不同数据库之间迁移注意点**
+>
+> 不同数据库之间迁移是指从其他类型的数据库迁移到MySQL数据库，或者从MySQL数据库迁移到其他类型的数据库。这种迁移没有普适的解决方法。
+>
+> 迁移之前，需要了解不同数据库的架构， 比较它们之间的差异 。不同数据库中定义相同类型的数据的 关 键字可能会不同 。例如，MySQL中日期字段分为DATE和TIME两种，而ORACLE日期字段只有DATE；SQL Server数据库中有ntext、Image等数据类型，MySQL数据库没有这些数据类型；MySQL支持的ENUM和SET类型，这些SQL Server数据库不支持。
+>
+> 另外，数据库厂商并没有完全按照SQL标准来设计数据库系统，导致不同的数据库系统的 SQL语句 有差别。例如，微软的SQL Server软件使用的是T-SQL语句，T-SQL中包含了非标准的SQL语句，不能和MySQL 的SQL语句兼容。
+>
+> 不同类型数据库之间的差异造成了互相 迁移的困难 ，这些差异其实是商业公司故意造成的技术壁垒。但是不同类型的数据库之间的迁移并 不是完全不可能 。例如，可以使用 MyODBC 实现MySQL和SQL Server之间的迁移。MySQL官方提供的工具 MySQL Migration Toolkit 也可以在不同数据之间进行数据迁移。MySQL迁移到Oracle时，需要使用mysqldump命令导出sql文件，然后， 手动更改 sql文件中的CREATE语句。
+
+#### 迁移小结
+
+![image-20221102153300041](https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20221102153300041.png)
+
+### 删库了不敢跑，能干点啥？
+
+#### delete：误删行
+
+> **经验之谈：**
+>
+> 1. 恢复数据比较安全的做法，是 恢复出一个备份 ，或者找一个从库作为 临时库 ，在这个临时库上执行这些操作，然后再将确认过的临时库的数据，恢复回主库。如果直接修改主库，可能导致对数据的 二次破坏 。 
+>
+> 2. 当然，针对预防误删数据的问题，建议如下：
+>    1. 把 sql_safe_updates 参数设置为 on 。这样一来，如果我们忘记在delete或者update语句中写where条件，或者where条件里面没有包含索引字段的话，这条语句的执行就会报错。如果确定要把一个小表的数据全部删掉，在设置了sql_safe_updates=on情况下，可以在delete语句中加上where条件，比如where id>=0。 
+>    2. 代码上线前，必须经过 SQL审计 。 
+
+#### truncate/drop ：误删库/表
+
+> 这种情况下，要想恢复数据，就需要使用 全量备份 ，加 增量日志 的方式了。这个方案要求线上有定期的全量备份，并且实时备份binlog。
+>
+> 在这两个条件都具备的情况下，假如有人中午12点误删了一个库，恢复数据的流程如下：
+>
+> 1. 取最近一次 全量备份 ，假设这个库是一天一备，上次备份是当天 凌晨2点 ； 
+>
+> 2. 用备份恢复出一个 临时库 ； 
+>
+> 3. 从日志备份里面，取出凌晨2点之后的日志；
+>
+> 4. 把这些日志，除了误删除数据的语句外，全部应用到临时库。
+
+
+#### 延迟复制备库
+
+> 如果有 非常核心 的业务，不允许太长的恢复时间，可以考虑**搭建延迟复制的备库。**一般的主备复制结构存在的问题是，如果主库上有个表被误删了，这个命令很快也会被发给所有从库，进而导致所有从库的数据表也都一起被误删了。
+>
+> 延迟复制的备库是一种特殊的备库，通过 `CHANGE MASTER TO MASTER_DELAY = N` 命令，可以指定这个备库持续保持跟主库有 N秒的延迟 。比如你把N设置为3600，这就代表了如果主库上有数据被误删了，并且在1小时内发现了这个误操作命令，这个命令就还没有在这个延迟复制的备库执行。这时候到这个备库上执行stop slave，再通过之前介绍的方法，跳过误操作命令，就可以恢复出需要的数据。
+
+#### 预防误删库/表的方法
+
+> 1. 账号分离 。这样做的目的是，避免写错命令。比如：
+>
+> 只给业务开发同学DML权限，而不给truncate/drop权限。而如果业务开发人员有DDL需求的话，可以通过开发管理系统得到支持。
+>
+> 即使是DBA团队成员，日常也都规定只使用 只读账号 ，必要的时候才使用有更新权限的账号。
+>
+> 2. 制定操作规范 。比如：
+>
+> 在删除数据表之前，必须先 对表做改名 操作。然后，观察一段时间，确保对业务无影响以后再删除这张表。
+>
+> 改表名的时候，要求给表名加固定的后缀（比如加 _to_be_deleted )，然后删除表的动作必须通过管理系统执行。并且，管理系统删除表的时候，只能删除固定后缀的表。
+
+#### rm：误删MySQL实例
+
+> 对于一个有高可用机制的MySQL集群来说，不用担心 rm删除数据 了。只是删掉了其中某一个节点的数据的话，HA系统就会开始工作，选出一个新的主库，从而保证整个集群的正常工作。我们要做的就是在这个节点上把数据恢复回来，再接入整个集群。
+
+### 附录：MySQL常用命令
+
+#### mysql
+
+> 该mysql不是指mysql服务，而是指mysql的客户端工具。
+
+##### 连接
+
+```shell
+mysql [options] [database]
+#参数 ：
+-u, --user=name 指定用户名
+-p, --password[=name] 指定密码
+-h, --host=name 指定服务器IP或域名
+-P, --port=# 指定连接端口 #示例 ：mysql -h 127.0.0.1 -P 3306 -u root -p
+mysql -h127.0.0.1 -P3306 -uroot -p密码
+```
+
+##### 执行选项
+
+> 此选项可以在Mysql客户端执行SQL语句，而不用连接到MySQL数据库再执行，对于一些批处理脚本，这种方式尤其方便。
+
+```shell
+-e, --execute=name 执行SQL语句并退出 
+#示例： 
+mysql -uroot -p db01 -e "select * from tb_book";
+```
+
+#### mysqladmin
+
+> mysqladmin 是一个执行管理操作的客户端程序。可以用它来检查服务器的配置和当前状态、创建并删除数据库等。mysqladmin --help 指令查看帮助文档
+
+```shell
+#示例 ：
+mysqladmin -uroot -p create 'test01'; 
+mysqladmin -uroot -p drop 'test01'; 
+mysqladmin -uroot -p version
+```
+
+#### mysqlbinlog
+
+> 由于服务器生成的二进制日志文件以二进制格式保存，所以如果想要检查这些文本的文本格式，就会使用到mysqlbinlog 日志管理工具。
+
+```shell
+mysqlbinlog [options] log-files1 log-files2 ... #选项：
+-d, --database=name : 指定数据库名称，只列出指定的数据库相关操作。
+-o, --offset=# : 忽略掉日志中的前n行命令。
+-r,--result-file=name : 将输出的文本格式日志输出到指定文件。
+-s, --short-form : 显示简单格式， 省略掉一些信息。
+--start-datatime=date1 --stop-datetime=date2 : 指定日期间隔内的所有日志。
+--start-position=pos1 --stop-position=pos2 : 指定位置间隔内的所有日志。
+```
+
+#### mysqldump
+
+> mysqldump 客户端工具用来备份数据库或在不同数据库之间进行数据迁移。备份内容包含创建表，及插入表的SQL语句。
+
+#### mysqlimport/source
+
+> mysqlimport 是客户端数据导入工具，用来导入mysqldump 加 -T 参数后导出的文本文件。如果需要导入sql文件,可以使用mysql中的source 指令 
+
+```shell
+mysqlimport [options] db_name textfile1 [textfile2...] 
+mysqlimport -uroot -p test /tmp/city.txt
+source /root/tb_book.sql
+```
+
+#### mysqlshow
+
+> mysqlshow 客户端对象查找工具，用来很快地查找存在哪些数据库、数据库中的表、表中的列或者索引。
+
+```shell
+mysqlshow [options] [db_name [table_name [col_name]]]
+--count 显示数据库及表的统计信息（数据库，表 均可以不指定）
+-i 显示指定数据库或者指定表的状态信息
+
+#查询每个数据库的表的数量及表中记录的数量 
+mysqlshow -uroot -p --count
+```
+

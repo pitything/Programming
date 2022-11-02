@@ -58,7 +58,7 @@
 >
 > - 如果存在mysql-libs的旧版本包，显示如下：
 >
->   <img src="/Users/leon_chiang/Library/Application%20Support/typora-user-images/image-20220826091807724.png" alt="image-20220826091807724" style="zoom:50%;" />
+>   <img src="https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20221102160124121.png" alt="image-20221102160124121" style="zoom:50%;" />
 >   
 > - 如果不存在mysql-lib的版本，显示如下：
 >
@@ -340,7 +340,7 @@
 >
 > - 如果是 MySQL8 版本，连接时还会出现如下问题：
 >
->   <img src="/Users/leon_chiang/Library/Application%20Support/typora-user-images/image-20220826102822125.png" alt="image-20220826102822125" style="zoom:50%;" />
+>   <img src="https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20221102160155053.png" alt="image-20221102160155053" style="zoom:50%;" />
 >   
 >   配置新连接报错：错误号码 2058，分析是 mysql 密码加密方法变了。
 >   
@@ -369,7 +369,7 @@ show variables like '%char%';
 
 > - MySQL8.0
 >
->   <img src="/Users/leon_chiang/Library/Application%20Support/typora-user-images/image-20220826145323727.png" alt="image-20220826145323727" style="zoom:50%;" />
+>   <img src="https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20221102160220841.png" alt="image-20221102160220841" style="zoom:50%;" />
 >   
 > - MySQL5.7
 >
@@ -1329,7 +1329,7 @@ REVOKE 'school_read' FROM 'kangshifu'@'localhost';
 >
 > **Oracle的架构图：**
 >
-> <img src="/Users/leon_chiang/Library/Application%20Support/typora-user-images/image-20220831093816549.png" alt="image-20220831093816549" style="zoom:50%;" />
+> <img src="https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20221102160256717.png" alt="image-20221102160256717" style="zoom:50%;" />
 >
 > <img src="https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20220831093836829.png" alt="image-20220831093836829" style="zoom:50%;" />
 
@@ -3817,7 +3817,7 @@ create index idx_age_name_classid on student(age,name,classid);
 >
 > Index(Height)表示索引高度
 >
-> <img src="/Users/leon_chiang/Library/Application%20Support/typora-user-images/image-20221018172840364.png" alt="image-20221018172840364" style="zoom:50%;" />
+> <img src="https://raw.githubusercontent.com/pitything/images/main/https://cdn.jsdelivr.net/gh/pitything/images@master/image-20221102160047201.png" alt="image-20221102160047201" style="zoom:50%;" />
 
 ##### Block Nested-Loop Join（块嵌套循环连接）
 

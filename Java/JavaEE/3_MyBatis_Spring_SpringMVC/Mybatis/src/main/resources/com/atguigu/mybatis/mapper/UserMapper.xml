@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.mybatis.mapper.UserMapper">
+    <cache/>
+
+    <!--int insertUser();-->
+    <insert id="insertUser" useGeneratedKeys="true" keyProperty="id">
+        insert into t_user
+        values (null, #{password}, #{age}, #{sex}, #{email}, 1, #{username})
+    </insert>
+
+    <!--void updateUser();-->
+    <update id="updateUser">
+        update t_user
+        set username = '张三'
+        where id = 4
+    </update>
+
+    <!--void deleteUser();-->
+    <delete id="deleteUser">
+        delete
+        from t_user
+        where id = 5
+    </delete>
+
+    <resultMap id="userMap" type="User">
+        <id property="id" column="id"></id>
+        <result property="userName" column="user_name"></result>
+        <result property="password" column="password"></result>
+        <result property="sex" column="sex"></result>
+        <!--        <result property="dept.deptId" column="dept_id"></result>-->
+        <!--        <result property="dept.deptName" column="dept_name"></result>-->
+        <!--                <association property="dept" javaType="Dept" >-->
+        <!--                    <id property="deptId" column="dept_id"></id>-->
+        <!--                    <result property="deptName" column="dept_name"></result>-->
+        <!--                </association>-->
+        <association property="dept" select="com.atguigu.mybatis.mapper.DeptMapper.getDeptById2"
+                     column="dept_id" fetchType="eager"></association>
+    </resultMap>
+
+    <!--    <select id="getUserById" resultMap="userMap">-->
+    <!--        select *-->
+    <!--        from t_user tu-->
+    <!--                 left join t_dept td on td.dept_id = tu.dept_id-->
+    <!--        where id = #{id}-->
+    <!--    </select>-->
+
+    <select id="getUserById" resultMap="userMap">
+        select *
+        from t_user tu
+        where id = #{id}
+    </select>
+
+    <select id="getUserByDeptId" resultType="user">
+        select *
+        from t_user tu
+        where dept_id = #{id}
+    </select>
+
+    <!--List<User> getAllUser();-->
+    <!--    <select id="getAllUser" resultType="MAP">-->
+    <select id="getAllUser" resultMap="userMap" flushCache="true" useCache="false">
+        select tu.id, tu.password, tu.age, tu.sex, tu.email, tu.dept_id, tu.user_name
+        from t_user tu
+        <where>
+                        <if test="id == 0" >
+                            tu.email = '0'
+            </if>
+        </where>
+    </select>
+</mapper>

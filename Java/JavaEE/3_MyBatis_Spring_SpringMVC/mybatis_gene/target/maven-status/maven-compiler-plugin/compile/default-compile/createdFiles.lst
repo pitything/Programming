@@ -1,0 +1,12 @@
+com/atguigu/mybatis/pojo/UserExample.class
+com/atguigu/mybatis/pojo/User.class
+com/atguigu/mybatis/pojo/UserExample$Criteria.class
+com/atguigu/mybatis/pojo/DeptExample$Criteria.class
+com/atguigu/mybatis/mapper/DeptMapper.class
+com/atguigu/mybatis/pojo/UserExample$Criterion.class
+com/atguigu/mybatis/pojo/DeptExample.class
+com/atguigu/mybatis/pojo/DeptExample$GeneratedCriteria.class
+com/atguigu/mybatis/pojo/DeptExample$Criterion.class
+com/atguigu/mybatis/pojo/Dept.class
+com/atguigu/mybatis/pojo/UserExample$GeneratedCriteria.class
+com/atguigu/mybatis/mapper/UserMapper.class

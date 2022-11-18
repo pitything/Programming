@@ -1,0 +1,189 @@
+[2022-11-13 13:23:04:111] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+====> Parameters: 1(Integer)
+
+[2022-11-13 13:23:04:113] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+<====      Total: 1
+
+[2022-11-13 13:23:04:115] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+<==      Total: 1
+
+[2022-11-13 13:23:04:118] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==>  Preparing: select td.dept_id, td.dept_name, tu.id, tu.user_Name, tu.password, tu.sex from t_dept td left join t_user tu on tu.dept_id = td.dept_id where td.dept_id = ?
+
+[2022-11-13 13:23:04:119] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==> Parameters: 1(Integer)
+
+[2022-11-13 13:23:04:125] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+<==      Total: 5
+
+[2022-11-13 13:28:08:353] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==>  Preparing: select td.dept_id, td.dept_name, tu.id, tu.user_Name, tu.password, tu.sex from t_dept td left join t_user tu on tu.dept_id = td.dept_id where td.dept_id = ?
+
+[2022-11-13 13:28:08:397] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==> Parameters: 1(Integer)
+
+[2022-11-13 13:28:08:436] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+====>  Preparing: select * from t_user tu where id = ?
+
+[2022-11-13 13:28:08:437] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+====> Parameters: 1(Integer)
+
+[2022-11-13 13:28:08:440] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+======>  Preparing: select dept_id, dept_name from t_dept where dept_id = ?
+
+[2022-11-13 13:28:08:440] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+======> Parameters: 1(Integer)
+
+[2022-11-13 13:28:08:443] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+<======      Total: 1
+
+[2022-11-13 13:28:08:445] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+<====      Total: 1
+
+[2022-11-13 13:28:08:446] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+<==      Total: 5
+
+[2022-11-13 13:28:24:329] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==>  Preparing: select td.dept_id, td.dept_name, tu.id, tu.user_Name, tu.password, tu.sex from t_dept td left join t_user tu on tu.dept_id = td.dept_id where td.dept_id = ?
+
+[2022-11-13 13:28:24:361] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==> Parameters: 1(Integer)
+
+[2022-11-13 13:28:24:392] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+====>  Preparing: select * from t_user tu where id = ?
+
+[2022-11-13 13:28:24:392] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+====> Parameters: 1(Integer)
+
+[2022-11-13 13:28:24:395] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+======>  Preparing: select dept_id, dept_name from t_dept where dept_id = ?
+
+[2022-11-13 13:28:24:396] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+======> Parameters: 1(Integer)
+
+[2022-11-13 13:28:24:399] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+<======      Total: 1
+
+[2022-11-13 13:28:24:402] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+<====      Total: 1
+
+[2022-11-13 13:28:24:404] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+<==      Total: 5
+
+[2022-11-13 13:29:49:283] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==>  Preparing: select td.dept_id, td.dept_name, tu.id, tu.user_Name, tu.password, tu.sex from t_dept td left join t_user tu on tu.dept_id = td.dept_id where td.dept_id = ?
+
+[2022-11-13 13:29:49:316] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==> Parameters: 1(Integer)
+
+[2022-11-13 13:29:49:343] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+====>  Preparing: select * from t_user tu where id = ?
+
+[2022-11-13 13:29:49:343] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+====> Parameters: 1(Integer)
+
+[2022-11-13 13:29:49:345] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+<====      Total: 1
+
+[2022-11-13 13:29:49:349] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+<==      Total: 5
+
+[2022-11-13 13:32:38:957] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==>  Preparing: select dept_id, dept_name from t_dept where dept_id = ?
+
+[2022-11-13 13:32:38:989] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==> Parameters: 1(Integer)
+
+[2022-11-13 13:32:39:017] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+====>  Preparing: select * from t_user tu where id = ?
+
+[2022-11-13 13:32:39:018] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+====> Parameters: 1(Integer)
+
+[2022-11-13 13:32:39:020] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+<====      Total: 1
+
+[2022-11-13 13:32:39:023] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+<==      Total: 1
+
+[2022-11-13 13:32:55:101] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==>  Preparing: select dept_id, dept_name from t_dept where dept_id = ?
+
+[2022-11-13 13:32:55:139] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==> Parameters: 2(Integer)
+
+[2022-11-13 13:32:55:175] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+====>  Preparing: select * from t_user tu where id = ?
+
+[2022-11-13 13:32:55:176] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+====> Parameters: 2(Integer)
+
+[2022-11-13 13:32:55:181] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+<====      Total: 1
+
+[2022-11-13 13:32:55:184] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+<==      Total: 1
+
+[2022-11-13 13:33:44:122] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==>  Preparing: select dept_id, dept_name from t_dept where dept_id = ?
+
+[2022-11-13 13:33:44:158] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==> Parameters: 2(Integer)
+
+[2022-11-13 13:33:44:188] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+====>  Preparing: select * from t_user tu where dept_id = ?
+
+[2022-11-13 13:33:44:189] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+====> Parameters: 2(Integer)
+
+[2022-11-13 13:33:44:193] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+<====      Total: 5
+
+[2022-11-13 13:33:44:196] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+<==      Total: 1
+
+[2022-11-13 13:40:21:251] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==>  Preparing: select * from t_user tu where id = ?
+
+[2022-11-13 13:40:21:289] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==> Parameters: 3(Integer)
+
+[2022-11-13 13:40:21:336] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+<==      Total: 1
+
+[2022-11-13 13:41:17:511] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==>  Preparing: select * from t_user tu where id = ?
+
+[2022-11-13 13:41:17:547] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==> Parameters: 3(Integer)
+
+[2022-11-13 13:41:17:579] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+====>  Preparing: select dept_id, dept_name from t_dept where dept_id = ?
+
+[2022-11-13 13:41:17:579] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+====> Parameters: 1(Integer)
+
+[2022-11-13 13:41:17:581] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+======>  Preparing: select * from t_user tu where dept_id = ?
+
+[2022-11-13 13:41:17:581] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+======> Parameters: 1(Integer)
+
+[2022-11-13 13:41:17:584] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+<======      Total: 5
+
+[2022-11-13 13:41:17:586] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+<====      Total: 1
+
+[2022-11-13 13:41:17:586] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+<==      Total: 1
+
+[2022-11-13 13:44:55:508] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==>  Preparing: select * from t_user tu where id = ?
+
+[2022-11-13 13:44:55:557] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==> Parameters: 3(Integer)
+
+[2022-11-13 13:44:55:596] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+====>  Preparing: select dept_id, dept_name from t_dept where dept_id = ?
+

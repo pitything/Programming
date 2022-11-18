@@ -2612,6 +2612,19 @@ DROP INDEX index_name ON table_name;
 
 支持降序索引，可以避免Using filesort，Using filesort是MySQL中一种速度比较慢的外部排序，能避免是最好的。多数情况下，管理员可以通过优化索引来尽量避免出现Using filesort，从而提高数据库执行速度。
 
+```sql
+CREATE TABLE t (
+    a INT,
+    b INT,
+    INDEX a_asc_b_asc (a ASC , b ASC),
+    INDEX a_asc_b_desc (a ASC , b DESC),
+    INDEX a_desc_b_asc (a DESC , b ASC),
+    INDEX a_desc_b_desc (a DESC , b DESC)
+);
+```
+
+
+
 #### 隐藏索引
 
 在MySQL 5.7版本及之前，只能通过显式的方式删除索引。此时，如果发现删除索引后出现错误，又只能通过显式创建索引的方式将删除的索引创建回来。如果数据表中的数据量非常大，或者数据表本身比较大，这种操作就会消耗系统过多的资源，操作成本非常高。

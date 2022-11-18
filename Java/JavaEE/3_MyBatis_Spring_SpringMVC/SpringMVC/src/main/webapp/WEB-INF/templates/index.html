@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>首页</title></head>
+<body>
+    <h1>首页</h1>
+    <a th:href="@{/hello}">HelloWorld</a><br/>
+    <a th:href="@{/test/test04/testParam(username='admin',password=123456)}">测试获取请求参数-- >/testParam</a><br>
+    <a th:href="@{/requestParam/testParam01(username='admin',password=123456)}">测试获取请求参数-- >/testParam</a><br>
+    <a th:href="@{/requestParam/testParam02(username='admin',password=123456)}">测试获取请求参数-- >/testParam</a><br>
+    <a th:href="@{/requestParam/testParam03(username='admin',password=123456)}">测试获取请求参数-- >/testParam</a><br>
+    <a th:href="@{/requestParam/testParam04(username='admin',password=123456)}">测试获取请求参数-- >/testParam</a><br>
+</body>
+</html>

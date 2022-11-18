@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.mybatis.mapper.DeptMapper">
+
+    <resultMap id="deptMap" type="Dept">
+        <id column="dept_id" property="deptId"></id>
+        <result column="dept_name" property="deptName"></result>
+                <collection property="userList" ofType="User">
+                    <id property="id" column="id"></id>
+                    <result property="userName" column="user_name"></result>
+                    <result property="password" column="password"></result>
+                    <result property="sex" column="sex"></result>
+                </collection>
+<!--        <collection property="userList" select="com.atguigu.mybatis.mapper.UserMapper.getUserByDeptId"-->
+<!--                     column="dept_id"></collection>-->
+    </resultMap>
+
+    <select id="getDeptById" resultMap="deptMap">
+        select td.dept_id, td.dept_name, tu.id, tu.user_Name, tu.password, tu.sex
+        from t_dept td
+        left join t_user tu on tu.dept_id = td.dept_id
+        where td.dept_id = #{id}
+    </select>
+
+<!--    <select id="getDeptById" resultMap="deptMap">-->
+<!--        select dept_id, dept_name-->
+<!--        from t_dept-->
+<!--        where dept_id = #{id}-->
+<!--    </select>-->
+
+    <select id="getDeptById2" resultType="dept">
+        select dept_id, dept_name
+        from t_dept
+        where dept_id = #{id}
+    </select>
+</mapper>

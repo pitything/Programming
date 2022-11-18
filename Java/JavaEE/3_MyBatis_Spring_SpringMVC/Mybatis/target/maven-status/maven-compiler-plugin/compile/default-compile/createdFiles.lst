@@ -1,0 +1,4 @@
+com/atguigu/mybatis/pojo/User.class
+com/atguigu/mybatis/mapper/DeptMapper.class
+com/atguigu/mybatis/pojo/Dept.class
+com/atguigu/mybatis/mapper/UserMapper.class

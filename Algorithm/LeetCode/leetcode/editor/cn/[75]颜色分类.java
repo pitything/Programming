@@ -56,8 +56,8 @@ class Solution75 {
     }
 
     public static void main(String[] args) {
-        int[] nums = new int[]{ 1 , 2 , 3 , 6};
-        // int[] nums = new int[]{-43 , 51 , 7 , 8, 1 , 2 , 3 , 6};
+        // int[] nums = new int[]{ 1 , 2 , 3 , 6};
+        int[] nums = new int[]{-43 , 51 , 7 , 8, 1 , 2 , 3 , 6};
         // System.out.println(Arrays.toString(bubbleSort2(nums)));
         // System.out.println(Arrays.toString(selectSort2(nums)));
         // System.out.println(Arrays.toString(insSort2(nums)));

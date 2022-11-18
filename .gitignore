@@ -3,5 +3,7 @@
 /Java/JavaSE/out/production/JavaSE
 /Java/JavaSE/out/test/JavaSE
 /out/
+/*/out/
 *.iml
 .idea
+/Java/JavaEE/*/out

@@ -1,0 +1,180 @@
+[2022-11-13 17:28:03:404] [DEBUG] [method:org.apache.ibatis.cache.decorators.LoggingCache.getObject(LoggingCache.java:60)]
+Cache Hit Ratio [com.atguigu.mybatis.mapper.UserMapper]: 0.0
+
+[2022-11-13 17:28:03:913] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==>  Preparing: select tu.id, tu.password, tu.age, tu.sex, tu.email, tu.dept_id, tu.user_name from t_user tu WHERE tu.email = '0'
+
+[2022-11-13 17:28:03:950] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==> Parameters: 
+
+[2022-11-13 17:28:03:985] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+====>  Preparing: select dept_id, dept_name from t_dept where dept_id = ?
+
+[2022-11-13 17:28:03:986] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+====> Parameters: 0(Integer)
+
+[2022-11-13 17:28:03:988] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+<====      Total: 0
+
+[2022-11-13 17:28:03:990] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+<==      Total: 1
+
+[2022-11-13 17:28:04:002] [DEBUG] [method:org.apache.ibatis.cache.decorators.LoggingCache.getObject(LoggingCache.java:60)]
+Cache Hit Ratio [com.atguigu.mybatis.mapper.UserMapper]: 0.5
+
+[2022-11-13 18:47:07:286] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==>  Preparing: select id, password, age, sex, email, dept_id, user_name from t_user where id = ?
+
+[2022-11-13 18:47:07:333] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==> Parameters: 0(Integer)
+
+[2022-11-13 18:47:07:363] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+<==      Total: 0
+
+[2022-11-13 18:47:17:771] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==>  Preparing: select id, password, age, sex, email, dept_id, user_name from t_user where id = ?
+
+[2022-11-13 18:47:17:805] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==> Parameters: 1(Integer)
+
+[2022-11-13 18:52:30:673] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==>  Preparing: select id, password, age, sex, email, dept_id, user_name from t_user where id = ?
+
+[2022-11-13 18:52:30:760] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==> Parameters: 1(Integer)
+
+[2022-11-13 18:52:30:827] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+<==      Total: 1
+
+[2022-11-13 18:52:52:992] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==>  Preparing: select id, password, age, sex, email, dept_id, user_name from t_user where id = ?
+
+[2022-11-13 18:52:53:028] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==> Parameters: 1(Integer)
+
+[2022-11-13 18:52:53:056] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+<==      Total: 1
+
+[2022-11-13 19:46:15:535] [DEBUG] [method:org.apache.ibatis.cache.decorators.LoggingCache.getObject(LoggingCache.java:60)]
+Cache Hit Ratio [SQL_CACHE]: 0.0
+
+[2022-11-13 19:46:15:708] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==>  Preparing: SELECT count(0) FROM t_user
+
+[2022-11-13 19:46:15:766] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==> Parameters: 
+
+[2022-11-13 19:46:15:814] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+<==      Total: 1
+
+[2022-11-13 19:46:15:821] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==>  Preparing: select id, password, age, sex, email, dept_id, user_name from t_user LIMIT ?, ?
+
+[2022-11-13 19:46:15:823] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==> Parameters: 10(Long), 5(Integer)
+
+[2022-11-13 19:46:15:830] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+<==      Total: 5
+
+[2022-11-13 19:50:31:433] [DEBUG] [method:org.apache.ibatis.cache.decorators.LoggingCache.getObject(LoggingCache.java:60)]
+Cache Hit Ratio [SQL_CACHE]: 0.0
+
+[2022-11-13 19:50:31:578] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==>  Preparing: SELECT count(0) FROM t_user
+
+[2022-11-13 19:50:31:642] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==> Parameters: 
+
+[2022-11-13 19:50:31:676] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+<==      Total: 1
+
+[2022-11-13 19:50:31:680] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==>  Preparing: select id, password, age, sex, email, dept_id, user_name from t_user LIMIT ?, ?
+
+[2022-11-13 19:50:31:682] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==> Parameters: 10(Long), 5(Integer)
+
+[2022-11-13 19:50:31:686] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+<==      Total: 5
+
+[2022-11-13 19:53:23:038] [DEBUG] [method:org.apache.ibatis.cache.decorators.LoggingCache.getObject(LoggingCache.java:60)]
+Cache Hit Ratio [SQL_CACHE]: 0.0
+
+[2022-11-13 19:53:23:227] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==>  Preparing: SELECT count(0) FROM t_user WHERE (id BETWEEN ? AND ?)
+
+[2022-11-13 19:53:23:300] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==> Parameters: 10(Integer), 19(Integer)
+
+[2022-11-13 19:53:23:341] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+<==      Total: 1
+
+[2022-11-13 19:53:50:257] [DEBUG] [method:org.apache.ibatis.cache.decorators.LoggingCache.getObject(LoggingCache.java:60)]
+Cache Hit Ratio [SQL_CACHE]: 0.0
+
+[2022-11-13 19:53:50:393] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==>  Preparing: SELECT count(0) FROM t_user WHERE (id BETWEEN ? AND ?)
+
+[2022-11-13 19:53:50:435] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==> Parameters: 10(Integer), 19(Integer)
+
+[2022-11-13 19:53:50:473] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+<==      Total: 1
+
+[2022-11-13 19:54:02:901] [DEBUG] [method:org.apache.ibatis.cache.decorators.LoggingCache.getObject(LoggingCache.java:60)]
+Cache Hit Ratio [SQL_CACHE]: 0.0
+
+[2022-11-13 19:54:03:024] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==>  Preparing: SELECT count(0) FROM t_user WHERE (id BETWEEN ? AND ?)
+
+[2022-11-13 19:54:03:080] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==> Parameters: 10(Integer), 19(Integer)
+
+[2022-11-13 19:54:03:135] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+<==      Total: 1
+
+[2022-11-13 19:54:03:140] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==>  Preparing: select id, password, age, sex, email, dept_id, user_name from t_user WHERE ( id between ? and ? ) LIMIT ?
+
+[2022-11-13 19:54:03:141] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==> Parameters: 10(Integer), 19(Integer), 5(Integer)
+
+[2022-11-13 19:54:03:148] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+<==      Total: 5
+
+[2022-11-13 19:55:15:889] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==>  Preparing: select id, password, age, sex, email, dept_id, user_name from t_user where id = ?
+
+[2022-11-13 19:55:15:940] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==> Parameters: 1(Integer)
+
+[2022-11-13 19:55:15:970] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+<==      Total: 1
+
+[2022-11-13 19:55:16:006] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==>  Preparing: select id, password, age, sex, email, dept_id, user_name from t_user WHERE ( id between ? and ? )
+
+[2022-11-13 19:55:16:007] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==> Parameters: 10(Integer), 19(Integer)
+
+[2022-11-13 19:55:16:012] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+<==      Total: 10
+
+[2022-11-14 09:54:59:241] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==>  Preparing: select id, password, age, sex, email, dept_id, user_name from t_user where id = ?
+
+[2022-11-14 09:54:59:276] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==> Parameters: 1(Integer)
+
+[2022-11-14 09:54:59:302] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+<==      Total: 1
+
+[2022-11-14 09:54:59:332] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==>  Preparing: select id, password, age, sex, email, dept_id, user_name from t_user WHERE ( id between ? and ? )
+
+[2022-11-14 09:54:59:333] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+==> Parameters: 10(Integer), 19(Integer)
+
+[2022-11-14 09:54:59:337] [DEBUG] [method:org.apache.ibatis.logging.jdbc.BaseJdbcLogger.debug(BaseJdbcLogger.java:137)]
+<==      Total: 10
+

@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util https://www.springframework.org/schema/util/spring-util.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!--    <bean id="student3" class="com.atguigu.beans.Student">-->
+    <!--        <property name="id" value="1001"></property>-->
+    <!--        <property name="name">-->
+    <!--            <null/>-->
+    <!--        </property>-->
+    <!--        <property name="age" value="23"></property>-->
+    <!--        <property name="sex" value="男"></property>-->
+    <!--        <property name="clazz" ref="clazz"></property>-->
+    <!--    </bean>-->
+
+    <!--    <bean id="helloWorld" class="com.atguigu.beans.HelloWorld"></bean>-->
+    <!--    <bean id="helloWorld1" class="com.atguigu.beans.HelloWorld"></bean>-->
+
+    <!--    <bean id="testClass" class="com.atguigu.beans.TestClass"></bean>-->
+    <!--    <bean id="TestClass2" class="com.atguigu.beans.TestClass2"></bean>-->
+
+<!--        <bean id="student" class="com.atguigu.beans.Student" autowire="byName">-->
+<!--            <constructor-arg name="id" value="1001"></constructor-arg>-->
+<!--            <constructor-arg name="name" value="张三"></constructor-arg>-->
+<!--            <constructor-arg name="age" value="23"></constructor-arg>-->
+<!--            <constructor-arg name="sex" value="男"></constructor-arg>-->
+<!--        </bean>-->
+    <!--    <bean id="studentOne" class="com.atguigu.beans.Student">-->
+    <!--        &lt;!&ndash; property标签：通过组件类的setXxx()方法给组件对象设置属性 &ndash;&gt;-->
+    <!--        &lt;!&ndash; name属性：指定属性名（这个属性名是getXxx()、setXxx()方法定义的，和成员变量无关） &ndash;&gt;-->
+    <!--        &lt;!&ndash; value属性：指定属性值 &ndash;&gt;-->
+    <!--        <property name="id" value="1001"></property>-->
+    <!--        &lt;!&ndash;        <property name="name" value="张三"></property>&ndash;&gt;-->
+    <!--        <property name="name">-->
+    <!--            <null/>-->
+    <!--        </property>-->
+    <!--        <property name="age" value="23"></property>-->
+    <!--        <property name="sex" value="男"></property>-->
+    <!--    </bean>-->
+
+    <!--    <bean id="clazz" class="com.atguigu.beans.Clazz">-->
+    <!--        <property name="clazzId" value="123"></property>-->
+    <!--        <property name="clazzName" value="123班"></property>-->
+    <!--    </bean>-->
+
+
+    <!--    <bean id="student4" class="com.atguigu.beans.Student">-->
+    <!--        <property name="id" value="1004"></property>-->
+    <!--        <property name="name" value="赵六"></property>-->
+    <!--        <property name="age" value="26"></property>-->
+    <!--        <property name="sex" value="女"></property>-->
+    <!--        <property name="clazz">-->
+    <!--            &lt;!&ndash; 在一个bean中再声明一个bean就是内部bean &ndash;&gt;-->
+    <!--            &lt;!&ndash; 内部bean只能用于给属性赋值，不能在外部通过IOC容器获取，因此可以省略id属性 &ndash;&gt;-->
+    <!--            <bean id="clazzInner" class="com.atguigu.beans.Clazz">-->
+    <!--                <property name="clazzId" value="2222"></property>-->
+    <!--                <property name="clazzName" value="远大前程班"></property>-->
+    <!--            </bean>-->
+    <!--        </property>-->
+    <!--    </bean>-->
+
+    <!--    <bean id="student5" class="com.atguigu.beans.Student">-->
+    <!--        <property name="id" value="1004"></property>-->
+    <!--        <property name="name" value="赵六"></property>-->
+    <!--        <property name="age" value="26"></property>-->
+    <!--        <property name="sex" value="女"></property> &lt;!&ndash; 一定先引用某个bean为属性赋值，才可以使用级联方式更新属性 &ndash;&gt;-->
+    <!--        <property name="clazz" ref="clazz"></property>-->
+    <!--        <property name="clazz.clazzId" value="3333"></property>-->
+    <!--        <property name="clazz.clazzName" value="最强王者班"></property>-->
+    <!--    </bean>-->
+
+    <!--    <bean id="student6" class="com.atguigu.beans.Student">-->
+    <!--        <property name="id" value="1004"></property>-->
+    <!--        <property name="name" value="赵六"></property>-->
+    <!--        <property name="age" value="26"></property>-->
+    <!--        <property name="sex" value="女"></property> &lt;!&ndash; ref属性：引用IOC容器中某个bean的id，将所对应的bean为属性赋值 &ndash;&gt;-->
+    <!--        <property name="clazz" ref="clazz"></property>-->
+    <!--        <property name="hobbies">-->
+    <!--            <array>-->
+    <!--                <value>抽烟</value>-->
+    <!--                <value>喝酒</value>-->
+    <!--                <value>烫头</value>-->
+    <!--            </array>-->
+    <!--        </property>-->
+    <!--    </bean>-->
+
+    <!--    <bean id="student7" class="com.atguigu.beans.Student">-->
+    <!--        <property name="id" value="1004"></property>-->
+    <!--        <property name="name" value="赵六"></property>-->
+    <!--        <property name="age" value="26"></property>-->
+    <!--        <property name="sex" value="女"></property> &lt;!&ndash; ref属性：引用IOC容器中某个bean的id，将所对应的bean为属性赋值 &ndash;&gt;-->
+    <!--        <property name="clazz" ref="clazz"></property>-->
+    <!--        <property name="sports">-->
+    <!--            <list>-->
+    <!--                <value>抽烟</value>-->
+    <!--                <value>喝酒</value>-->
+    <!--                <value>烫头</value>-->
+    <!--            </list>-->
+    <!--        </property>-->
+    <!--    </bean>-->
+
+    <!--    <bean id="teacherOne" class="com.atguigu.beans.Teacher">-->
+    <!--        <property name="teacherId" value="10010"></property>-->
+    <!--        <property name="teacherName" value="大宝"></property>-->
+    <!--    </bean>-->
+    <!--    <bean id="teacherTwo" class="com.atguigu.beans.Teacher">-->
+    <!--        <property name="teacherId" value="10086"></property>-->
+    <!--        <property name="teacherName" value="二宝"></property>-->
+    <!--    </bean>-->
+    <!--    <bean id="studentFour" class="com.atguigu.beans.Student">-->
+    <!--        <property name="id" value="1004"></property>-->
+    <!--        <property name="name" value="赵六"></property>-->
+    <!--        <property name="age" value="26"></property>-->
+    <!--        <property name="sex" value="女"></property> &lt;!&ndash; ref属性：引用IOC容器中某个bean的id，将所对应的bean为属性赋值 &ndash;&gt;-->
+    <!--        <property name="teacherMap">-->
+    <!--            <map>-->
+    <!--                <entry>-->
+    <!--                    <key>-->
+    <!--                        <value>10010</value>-->
+    <!--                    </key>-->
+    <!--                    <ref bean="teacherOne"></ref>-->
+    <!--                </entry>-->
+    <!--                <entry>-->
+    <!--                    <key>-->
+    <!--                        <value>10086</value>-->
+    <!--                    </key>-->
+    <!--                    <ref bean="teacherTwo"></ref>-->
+    <!--                </entry>-->
+    <!--            </map>-->
+    <!--        </property>-->
+    <!--    </bean>-->
+
+
+    <!--    &lt;!&ndash;list集合类型的bean&ndash;&gt;-->
+    <!--    <util:list id="students">-->
+    <!--        <ref bean="studentOne"></ref>-->
+    <!--        <ref bean="student3"></ref>-->
+    <!--        <ref bean="student4"></ref>-->
+    <!--    </util:list> &lt;!&ndash;map集合类型的bean&ndash;&gt;-->
+    <!--    <util:map id="teacherMap">-->
+    <!--        <entry>-->
+    <!--            <key>-->
+    <!--                <value>10010</value>-->
+    <!--            </key>-->
+    <!--            <ref bean="teacherOne"></ref>-->
+    <!--        </entry>-->
+    <!--        <entry>-->
+    <!--            <key>-->
+    <!--                <value>10086</value>-->
+    <!--            </key>-->
+    <!--            <ref bean="teacherTwo"></ref>-->
+    <!--        </entry>-->
+    <!--    </util:map>-->
+    <!--    <bean id="clazzTwo" class="com.atguigu.beans.Clazz">-->
+    <!--        <property name="clazzId" value="4444"></property>-->
+    <!--        <property name="clazzName" value="Javaee0222"></property>-->
+    <!--    </bean>-->
+    <!--    <bean id="student10" class="com.atguigu.beans.Student">-->
+    <!--        <property name="id" value="1004"></property>-->
+    <!--        <property name="name" value="赵六"></property>-->
+    <!--        <property name="age" value="26"></property>-->
+    <!--        <property name="sex" value="女"></property> &lt;!&ndash; ref属性：引用IOC容器中某个bean的id，将所对应的bean为属性赋值 &ndash;&gt;-->
+    <!--        <property name="clazz" ref="clazz"></property>-->
+    <!--        <property name="hobbies">-->
+    <!--            <array>-->
+    <!--                <value>抽烟</value>-->
+    <!--                <value>喝酒</value>-->
+    <!--                <value>烫头</value>-->
+    <!--            </array>-->
+    <!--        </property>-->
+    <!--        <property name="teacherMap" ref="teacherMap"></property>-->
+    <!--    </bean>-->
+
+    <!--    <bean id="studentSix" class="com.atguigu.beans.Student" p:id="1006" p:name="小明" p:clazz-ref="clazz"-->
+    <!--          p:teacherMap-ref="teacherMap"></bean>-->
+
+    <!--    &lt;!&ndash; 引入外部属性文件 &ndash;&gt;-->
+    <!--    <context:property-placeholder location="classpath:jdbc.properties"/>-->
+    <!--    <bean id="druidDataSource" class="com.alibaba.druid.pool.DruidDataSource">-->
+    <!--        <property name="url" value="${jdbc.url}"/>-->
+    <!--        <property name="driverClassName" value="${jdbc.driver}"/>-->
+    <!--        <property name="username" value="${jdbc.user}"/>-->
+    <!--        <property name="password" value="${jdbc.password}"/>-->
+    <!--    </bean>-->
+
+    <!--    &lt;!&ndash; 使用init-method属性指定初始化方法 &ndash;&gt;-->
+    <!--    &lt;!&ndash; 使用destroy-method属性指定销毁方法 &ndash;&gt;-->
+    <!--    <bean class="com.atguigu.beans.User" scope="prototype" init-method="initMethod" destroy-method="destroyMethod">-->
+    <!--        <property name="id" value="1001"></property>-->
+    <!--        <property name="username" value="admin"></property>-->
+    <!--        <property name="password" value="123456"></property>-->
+    <!--        <property name="age" value="23"></property>-->
+    <!--    </bean>-->
+
+    <!--    <bean id="myBeanPostProcessor" class="com.atguigu.process.MyBeanPostProcessor"></bean>-->
+
+    <!--    <context:component-scan base-package="com.atguigu"></context:component-scan>-->
+
+
+    <bean id="clazz1" class="com.atguigu.beans.Clazz"></bean>
+    <bean id="clazz2" class="com.atguigu.beans.Clazz"></bean>
+    <context:component-scan base-package="com.atguigu">
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"></context:exclude-filter>
+    </context:component-scan>
+</beans>

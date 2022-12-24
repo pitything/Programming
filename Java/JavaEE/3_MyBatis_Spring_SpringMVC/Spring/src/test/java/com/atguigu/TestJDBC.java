@@ -15,6 +15,7 @@ import java.util.List;
 @RunWith(SpringJUnit4ClassRunner.class)
 // 读取配置
 @ContextConfiguration("classpath:spring-jdbc.xml")
+// @ContextConfiguration(classes = User.class)
 public class TestJDBC {
     @Autowired
     private JdbcTemplate jdbcTemplate;

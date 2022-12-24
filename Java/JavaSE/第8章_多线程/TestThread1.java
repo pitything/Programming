@@ -71,7 +71,7 @@ public class TestThread1 {
         // 1.execute 用于执行Runnable接口的线程
         Thread2 thread22 = new Thread2();
         executorService.execute(thread22);
-        // 2.submit 用于执行Callable接口的线程
+        // 2.submit 用于执行Runable、Callable接口的线程
         Thread3 thread33 = new Thread3(333);
         Future<?> submit = executorService.submit(thread33);
         System.out.println("submit: " + submit.get());

@@ -46,7 +46,7 @@ import java.util.List;
 import java.util.Queue;
 
 //leetcode submit region begin(Prohibit modification and deletion)
-class Solution {
+class Solution207 {
 
     // 存放每个节点的下一层节点
     List<List<Integer>> edge;

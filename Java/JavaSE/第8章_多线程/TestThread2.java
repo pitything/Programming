@@ -7,32 +7,37 @@ public class TestThread2 {
     public static int ticketCount = 100;
     public static void main(String[] args) {
         /** 不共享一个seller，但是ticketCount是静态的static */
-//        Thread thread1 = new Thread(new Seller(), "售票处1");
-//        Thread thread2 = new Thread(new Seller(), "售票处2");
-//        Thread thread3 = new Thread(new Seller(), "售票处3");
-        Thread thread1 = new Thread(new Seller2(), "售票处1");
-        Thread thread2 = new Thread(new Seller2(), "售票处2");
-        Thread thread3 = new Thread(new Seller2(), "售票处3");
+       Thread thread1 = new Thread(new Seller(), "售票处1");
+       Thread thread2 = new Thread(new Seller(), "售票处2");
+       Thread thread3 = new Thread(new Seller(), "售票处3");
+//         Thread thread1 = new Thread(new Seller2(), "售票处1");
+//         Thread thread2 = new Thread(new Seller2(), "售票处2");
+//         Thread thread3 = new Thread(new Seller2(), "售票处3");
 
         /** 共享同一个seller，共用一个ticketCount */
-//        Seller2 seller = new Seller2();
-//        Thread thread1 = new Thread(seller, "售票处1");
-//        Thread thread2 = new Thread(seller, "售票处2");
-//        Thread thread3 = new Thread(seller, "售票处3");
+//        Seller2 seller2 = new Seller2();
+//        Thread thread1 = new Thread(seller2, "售票处1");
+//        Thread thread2 = new Thread(seller2, "售票处2");
+//        Thread thread3 = new Thread(seller2, "售票处3");
+
         thread1.start();
         thread2.start();
         thread3.start();
     }
 }
 
+/**
+ * 同步方法
+ */
 class Seller implements Runnable{
-    //        public static int ticketCount = 100;
-    public int ticketCount = 1000;
-    Object object = new Object();
+    public static Integer ticketCount = 100;
+    // public int ticketCount = 100;
+    public Object object = new Object();
     @Override
     public void run() {
         while (true) {
-            synchronized (this) {
+            synchronized (Seller.class) {
+            // synchronized (object) {
                 if (ticketCount > 0) {
                     try {
                         Thread.sleep(10);
@@ -48,6 +53,9 @@ class Seller implements Runnable{
     }
 }
 
+/**
+ * 同步代码块
+ */
 class Seller2 implements Runnable{
     //        public static int ticketCount = 100;
     public static int ticketCount = 300;
@@ -60,7 +68,7 @@ class Seller2 implements Runnable{
     }
 
     public static synchronized void method(){
-//    public synchronized void method(){
+   // public synchronized void method(){
         if (ticketCount > 0) {
             try {
                 Thread.sleep(10);

@@ -1,4 +1,4 @@
-# 基础篇Redis
+# Redis入门篇
 
 ## 开篇导读
 
@@ -909,7 +909,7 @@ Redis中的List类型与Java中的LinkedList类似，可以看做是一个双向
 - LRANGE key star end：返回一段角标范围内的所有元素
 - BLPOP和BRPOP：与LPOP和RPOP类似，只不过在没有元素时等待指定时间，而不是直接返回nil
 
-![1652943604992](.\Redis.assets\1652943604992.png)
+![1652943604992](.\assets\1652943604992.png)
 
 * LPUSH和RPUSH
 
@@ -1104,7 +1104,7 @@ SortedSet的常见命令有：
 
 0）创建工程：
 
-![1652959239813](\Redis.assets\1652959239813.png)
+![1652959239813](\assets\1652959239813.png)
 
 
 
@@ -1280,7 +1280,7 @@ SpringData是Spring中数据操作的模块，包含对各种数据库的集成�
 
 SpringDataRedis中提供了RedisTemplate工具类，其中封装了各种对Redis的操作。并且将不同数据类型的操作API封装到了不同的类型中：
 
-![1652976773295](.\Redis.assets\1652976773295.png)
+![1652976773295](.\assets\1652976773295.png)
 
 
 
@@ -1469,13 +1469,13 @@ public class RedisConfig {
 
 尽管JSON的序列化方式可以满足我们的需求，但依然存在一些问题，如图：
 
-![1653054602930](.\Redis.assets\1653054602930.png)
+![1653054602930](.\assets\1653054602930.png)
 
 为了在反序列化时知道对象的类型，JSON序列化器会将类的class类型写入json结果中，存入Redis，会带来额外的内存开销。
 
 为了减少内存的消耗，我们可以采用手动序列化的方式，换句话说，就是不借助默认的序列化器，而是我们自己来控制序列化的动作，同时，我们只采用String的序列化器，这样，在存储value时，我们就不需要在内存中就不用多存储数据，从而节约我们的内存空间
 
-![1653054744832](.\Redis.assets\1653054744832.png)
+![1653054744832](.\assets\1653054744832.png)
 
 这种用法比较普遍，因此SpringDataRedis就提供了RedisTemplate的子类：StringRedisTemplate，它的key和value的序列化方式默认就是String方式。
 
@@ -1524,7 +1524,7 @@ class RedisStringTests {
 
 此时我们再来看一看存储的数据，小伙伴们就会发现那个class数据已经不在了，节约了我们的空间~
 
-![1653054945211](.\Redis.assets\1653054945211.png)
+![1653054945211](.\assets\1653054945211.png)
 
 最后小总结：
 

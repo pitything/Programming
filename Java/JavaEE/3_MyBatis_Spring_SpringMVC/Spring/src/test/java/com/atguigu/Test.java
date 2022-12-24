@@ -1,11 +1,9 @@
 package com.atguigu;
 
-import com.alibaba.druid.pool.DruidDataSource;
-import com.alibaba.druid.pool.DruidPooledConnection;
-import com.atguigu.beans.*;
+import com.atguigu.beans.Student;
+import com.atguigu.beans.User;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-import javax.annotation.Resource;
 import java.sql.SQLException;
 
 public class Test {

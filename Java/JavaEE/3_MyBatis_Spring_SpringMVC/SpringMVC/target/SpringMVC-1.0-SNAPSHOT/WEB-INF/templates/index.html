@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>首页</title></head>
+<body>
+<h1>首页</h1>
+<a th:href="@{/hello}">HelloWorld</a><br/>
+<a th:href="@{/test/test04/testParam(username='admin',password=123456)}">测试获取请求参数-- >/testParam</a><br>
+<a th:href="@{/requestParam/testParam01(username='admin',password=123456)}">测试获取请求参数-- >/testParam01</a><br>
+<a th:href="@{/requestParam/testParam02(username='admin',password=123456)}">测试获取请求参数-- >/testParam02</a><br>
+<a th:href="@{/requestParam/testParam03(username='admin',password=123456)}">测试获取请求参数-- >/testParam03</a><br>
+<a th:href="@{/requestParam/testParam04(username='admin',password=123456)}">测试获取请求参数-- >/testParam04</a><br>
+
+<hr/>
+<a th:href="@{/shareData/shareData01}">测试共享域-- > request</a><br>
+<a th:href="@{/shareData/shareData02}">测试共享域-- > ModelAndView</a><br>
+<a th:href="@{/shareData/shareData03}">测试共享域-- > Model</a><br>
+<a th:href="@{/shareData/shareData04}">测试共享域-- > map</a><br>
+<a th:href="@{/shareData/shareData05}">测试共享域-- > session</a><br>
+<a th:href="@{/shareData/shareData06}">测试共享域-- > application</a><br>
+<a th:href="@{/shareData/shareData07}">测试共享域-- > modelmap</a><br>
+<a th:href="@{/shareData/}">测试共享域-- > request</a><br>
+
+<hr/>
+<a th:href="@{/employee}">访问员工信息</a>
+
+<hr/>
+<div id="app">
+    <input type="button" value="测试@RequestBody获取json格式的请求参数" @click="testRequestBody()">
+    <br>
+    <input type="button" value="测试@ResponseBody获取json格式的返回值" @click="testResponseBody()">
+    <br>
+    <input type="button" value="测试@ResponseBody获取json格式的返回值--map" @click="testResponseBodyMap()">
+    <br>
+    <input type="button" value="测试@ResponseBody获取json格式的返回值--list" @click="testResponseBodyList()">
+    <br>
+</div>
+
+<hr/>
+<a th:href="@{/testFileUpDown/testDown}">文件下载</a>
+<form th:action="@{/testFileUpDown/testUp}" method="post" enctype="multipart/form-data">
+    头像：<input type="file" name="photo"><br/>
+    <input type="submit">
+</form>
+
+<script type="text/javascript" th:src="@{/js/vue.js}"></script>
+<script type="text/javascript" th:src="@{/js/axios.min.js}"></script>
+<script type="text/javascript">
+    var vue = new Vue({
+        el: "#app",
+        methods: {
+            testRequestBody() {
+                axios.post("/test/RequestBody/json", {username: "admin", password: "123456"})
+                    .then(response => {
+                        console.log(response.data);
+                    });
+            },
+            testResponseBody(){
+                axios.post(
+                    "/test/ResponseBody/getUser", {}
+                ).then(response => {
+                    console.log(response.data);
+                });
+            },
+            testResponseBodyMap(){
+                axios.post(
+                    "/test/ResponseBody/getUserMap", {}
+                ).then(response => {
+                    console.log(response.data);
+                });
+            },
+            testResponseBodyList(){
+                axios.post(
+                    "/test/ResponseBody/getUserList", {}
+                ).then(response => {
+                    console.log(response.data);
+                });
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

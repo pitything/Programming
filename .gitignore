@@ -7,3 +7,5 @@
 *.iml
 .idea
 /Java/JavaEE/*/out
+venv
+/Java/JavaEE/5_Redis_docker/hmdp/target
